@@ -22,9 +22,8 @@ import {
   addDoc,
   collection,
 } from "firebase/firestore";
-import AgentAmountContent from "../../components/AgentAmountContent";
-import TransactionDisplay from "../../components/AgentTransaction";
 import InvestmentProfileButtons from "../../components/InvestmentProfileButtons";
+import AmountContent from "../../components/AmountContent";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -67,6 +66,25 @@ export default function Index() {
       <SafeAreaView style={styles.androidSafeArea} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.mainContainer}>
+          <AmountContent walletAmount={data.walletAmount} />
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={() => router.push("deposit")}
+            >
+              <Text style={{ color: "#00a651", fontWeight: "500" }}>
+                DEPOSIT
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={() => router.push("withdraw")}
+            >
+              <Text style={{ color: "#00a651", fontWeight: "500" }}>
+                WITHDRAW
+              </Text>
+            </TouchableOpacity>
+          </View>
           <InvestmentProfileButtons userId={userId} />
         </View>
       </TouchableWithoutFeedback>
@@ -104,5 +122,19 @@ const styles = StyleSheet.create({
   androidSafeArea: {
     paddingTop: Platform.OS === "android" ? 80 : 0,
     opacity: 0,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    width: "100%",
+    marginTop: 25,
+  },
+  buttonContainer: {
+    flex: 1,
+    height: 40,
+    backgroundColor: "#ddf6e1",
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 5,
   },
 });

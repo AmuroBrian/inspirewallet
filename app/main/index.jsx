@@ -34,7 +34,7 @@ export default function Index() {
   const DATA = [
     {
       id: "1",
-      title: "Investment Profile",
+      title: "Available Balance",
       iconSource: require("../../assets/images/investmentprofile.png"),
       routeData: () => {
         router.push("investmentprofile");
@@ -183,7 +183,7 @@ export default function Index() {
           }
           ListFooterComponent={
             <View style={{ width: "100%" }}>
-              {/* <CurrencyConverter /> */}
+              <CurrencyConverter />
               <View style={styles.buttonRow}>
                 <TouchableOpacity
                   style={styles.buttonContainer}

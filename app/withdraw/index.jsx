@@ -13,6 +13,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -28,6 +29,7 @@ export default function Index() {
   const [userData, setUserData] = useState({ firstName: "", lastName: "" });
   const [open, setOpen] = useState(false);
   const [type, setType] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state
 
   useEffect(() => {
     navigation.setOptions({
@@ -88,6 +90,8 @@ export default function Index() {
       }
       return; // Exit the function if validation fails
     }
+
+    setLoading(true); // Start loading
     try {
       await send(
         process.env.EXPO_PUBLIC_SERVICE_ID,
@@ -121,6 +125,8 @@ export default function Index() {
           ToastAndroid.SHORT
         );
       }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -215,9 +221,17 @@ export default function Index() {
                 about 5–7 working days.
               </Text>
 
-              <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
-                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-              </TouchableOpacity>
+              {loading ? (
+                <ActivityIndicator size="large" color="#00a651" />
+              ) : (
+                <TouchableOpacity
+                  style={styles.submitButton}
+                  onPress={onSubmit}
+                  disabled={loading}
+                >
+                  <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
+                </TouchableOpacity>
+              )}
               <View style={{ width: "100%", height: 300 }} />
             </ScrollView>
           </TouchableWithoutFeedback>

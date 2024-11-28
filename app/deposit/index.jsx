@@ -13,12 +13,12 @@ import {
   Alert,
   Platform,
   ToastAndroid,
-  FlatList,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "expo-router";
 import CurrencyConverter from "../../components/CurrencyConverter";
-import { send, EmailJSResponseStatus } from "@emailjs/react-native";
+import { send } from "@emailjs/react-native";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -29,25 +29,11 @@ export default function Index() {
   const auth = getAuth();
   const navigation = useNavigation();
   const [userData, setUserData] = useState({ firstName: "", lastName: "" });
-
-  const openTargetApp = () => {
-    if (Platform.OS === "ios") {
-      const targetAppURL = "maps://";
-    } else {
-      const targetAppURL =
-        "https://play.google.com/store/search?q=paymaya&c=apps&hl=en";
-    }
-
-    Linking.canOpenURL(targetAppURL)
-      .then((supported) => {
-        if (supported) {
-          return Linking.openURL(targetAppURL);
-        } else {
-          Alert.alert("Target app isn't installed or URL scheme is invalid");
-        }
-      })
-      .catch((err) => console.error("Error opening app:", err));
-  };
+  const [amount, setAmount] = useState("");
+  const [email, setEmail] = useState("");
+  const [type, setType] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   useEffect(() => {
     navigation.setOptions({
@@ -83,11 +69,6 @@ export default function Index() {
     fetchUserData();
   }, []);
 
-  const [amount, setAmount] = useState("");
-  const [email, setEmail] = useState("");
-  const [type, setType] = useState(null);
-  const [open, setOpen] = useState(false);
-
   const onSubmit = async () => {
     if (!amount || !email || !type) {
       if (Platform.OS === "ios") {
@@ -99,6 +80,8 @@ export default function Index() {
       }
       return;
     }
+
+    setIsLoading(true); // Start loading
 
     try {
       await send(
@@ -127,6 +110,8 @@ export default function Index() {
           ToastAndroid.SHORT
         );
       }
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -187,19 +172,28 @@ export default function Index() {
                 your investment or stock purchase details. Please note that
                 approval for the request will take about 2–3 working days.
               </Text>
-              <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
-                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.submitPaypalButton}
-                onPress={() =>
-                  Linking.openURL(
-                    "https://www.paypal.com/ncp/payment/8SB8AW72XCHPJ"
-                  )
-                }
-              >
-                <Text style={styles.submitPaypalText}>PAY VIA PAYPAL</Text>
-              </TouchableOpacity>
+              {isLoading ? (
+                <ActivityIndicator size="large" color="#00a651" />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={onSubmit}
+                  >
+                    <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.submitPaypalButton}
+                    onPress={() =>
+                      Linking.openURL(
+                        "https://www.paypal.com/ncp/payment/8SB8AW72XCHPJ"
+                      )
+                    }
+                  >
+                    <Text style={styles.submitPaypalText}>PAY VIA PAYPAL</Text>
+                  </TouchableOpacity>
+                </>
+              )}
               <CurrencyConverter />
             </View>
           </KeyboardAwareScrollView>

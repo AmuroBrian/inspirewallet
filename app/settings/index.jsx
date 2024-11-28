@@ -22,33 +22,47 @@ import IconButton from "../../components/IconButton";
 export default function Index() {
   const navigation = useNavigation();
   const router = useRouter();
-  // const openApp = async (url) => {
-  //   try {
-  //     const supported = await Linking.canOpenURL(url);
-  //     if (supported) {
-  //       await Linking.openURL(url);
-  //     } else {
-  //       if (Platform.OS === "ios") {
-  //         Alert.alert(
-  //           "Uninstalled App",
-  //           "Please install the app before proceeding.",
-  //           ["OK"]
-  //         );
-  //       } else if (Platform.OS === "android") {
-  //         ToastAndroid.show("The app is not installed", ToastAndroid.SHORT);
-  //       } else {
-  //         console.log("Error Platform");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error opening app:", error);
-  //   }
-  // };
+  const openApp = async (url) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        if (Platform.OS === "ios") {
+          await Linking.openURL(url);
+        } else if (Platform.OS == "android") {
+          if (url === "gcash://") {
+            await Linking.openURL(
+              "https://play.google.com/store/apps/details?id=com.globe.gcash.android&pli=1"
+            );
+          } else if (url === "paymaya://") {
+            await Linking.openURL(
+              "https://play.google.com/store/apps/details?id=com.paymaya&hl=en"
+            );
+          }
+        } else {
+          console.log("Error Platform");
+        }
+      } else {
+        if (Platform.OS === "ios") {
+          Alert.alert(
+            "Uninstalled App",
+            "Please install the app before proceeding.",
+            ["OK"]
+          );
+        } else if (Platform.OS === "android") {
+          ToastAndroid.show("The app is not installed", ToastAndroid.SHORT);
+        } else {
+          console.log("Error Platform");
+        }
+      }
+    } catch (error) {
+      console.error("Error opening app:", error);
+    }
+  };
 
   const DATA = [
     {
       id: "1",
-      title: "Investment Profile",
+      title: "Available Balance",
       iconSource: require("../../assets/images/investmentprofile.png"),
       routeData: () => {
         router.push("investmentprofile");
@@ -74,19 +88,25 @@ export default function Index() {
       id: "4",
       title: "Inspire Cards",
       iconSource: require("../../assets/images/card.png"),
-      routeData: null,
+      routeData: () => {
+        router.push("inspirecards");
+      },
     },
     {
       id: "5",
       title: "Maya",
       iconSource: require("../../assets/images/maya.png"),
-      routeData: null,
+      routeData: () => {
+        openApp("paymaya://");
+      },
     },
     {
       id: "6",
       title: "Gcash",
       iconSource: require("../../assets/images/gcash.png"),
-      routeData: null,
+      routeData: () => {
+        openApp("gcash://");
+      },
     },
     {
       id: "7",

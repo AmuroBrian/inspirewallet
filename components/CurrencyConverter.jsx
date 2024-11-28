@@ -24,20 +24,16 @@ export default function CurrencyConverter() {
   // Fetch currencies when the component mounts
   useEffect(() => {
     let isMounted = true; // Track component mount status
-    console.log("Fetching currencies...");
 
     const fetchCurrencies = async () => {
       try {
-        console.log("Making API request for currencies...");
         const response = await axios.get(
           "https://api.exchangerate-api.com/v4/latest/USD",
           { timeout: 5000 } // Set a timeout of 5 seconds
         );
-        console.log("API response received:", response);
 
         // Check if the response data is valid
         if (response && response.data && response.data.rates) {
-          console.log("Valid response data found. Extracting currencies...");
           if (isMounted) {
             const currencyList = Object.keys(response.data.rates).map(
               (currency) => ({
@@ -45,12 +41,10 @@ export default function CurrencyConverter() {
                 value: currency,
               })
             );
-            console.log("Currencies extracted:", currencyList);
             setCurrencies(currencyList);
             setLoading(false);
           }
         } else {
-          console.log("Invalid data from API:", response);
           setError("Invalid data from API");
           setLoading(false);
         }
@@ -74,31 +68,22 @@ export default function CurrencyConverter() {
   // Convert currency when the amount or currency changes
   useEffect(() => {
     if (fromCurrency && toCurrency) {
-      console.log(
-        `Converting currency: ${amount} ${fromCurrency} to ${toCurrency}`
-      );
       convertCurrency();
     }
   }, [amount, fromCurrency, toCurrency]);
 
   const convertCurrency = async () => {
     try {
-      console.log(
-        `Making conversion request for ${fromCurrency} to ${toCurrency}...`
-      );
       const response = await axios.get(
         `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`,
         { timeout: 5000 } // Set a timeout of 5 seconds
       );
-      console.log("Conversion API response received:", response);
 
       if (response && response.data && response.data.rates) {
         const rate = response.data.rates[toCurrency];
-        console.log(`Conversion rate: ${rate}`);
         if (rate) {
           setResult((amount * rate).toFixed(2));
         } else {
-          console.log(`No rate found for ${toCurrency}`);
           setError(`No conversion rate found for ${toCurrency}`);
         }
       } else {
@@ -113,7 +98,6 @@ export default function CurrencyConverter() {
 
   // Show loading indicator if currencies are being fetched
   if (loading) {
-    console.log("Loading... waiting for currencies.");
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
@@ -125,11 +109,8 @@ export default function CurrencyConverter() {
 
   // Check if currencies is empty
   if (currencies.length === 0) {
-    console.log("Currencies list is empty.");
     return <Text style={styles.error}>No currencies available</Text>;
   }
-
-  console.log("Rendering UI with currencies and selected values:", currencies);
 
   return (
     <View style={styles.container}>
@@ -149,7 +130,6 @@ export default function CurrencyConverter() {
           keyboardType="numbers-and-punctuation"
           value={amount}
           onChangeText={(text) => {
-            console.log("Amount changed to:", text);
             setAmount(text);
           }}
           editable={true}
@@ -170,7 +150,6 @@ export default function CurrencyConverter() {
           dropDownContainerStyle={styles.dropdownContainer}
           dropdownStyle={styles.dropdownStyle}
           onChangeValue={(value) => {
-            console.log("From Currency selected:", value);
             setFromCurrency(value);
           }}
         />
@@ -186,7 +165,6 @@ export default function CurrencyConverter() {
           dropDownContainerStyle={styles.dropdownContainer}
           dropdownStyle={styles.dropdownStyle}
           onChangeValue={(value) => {
-            console.log("To Currency selected:", value);
             setToCurrency(value);
           }}
         />
@@ -218,10 +196,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center", // Align dropdowns vertically
-    width: "100%",
+    width: "50%",
+    gap: 1,
   },
   dropdown: {
-    flex: 1, // Take equal space for alignment
+    width: "95%", // Take equal space for alignment
     marginHorizontal: 5, // Add some spacing
     height: 40, // Match the height of the TextInput for consistency
   },
