@@ -5,11 +5,12 @@ import {
   TextInput,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import axios from "axios";
 import DropDownPicker from "react-native-dropdown-picker";
 
-const CurrencyConverter = () => {
+export default function CurrencyConverter() {
   const [amount, setAmount] = useState("1");
   const [result, setResult] = useState("");
   const [currencies, setCurrencies] = useState([]);
@@ -20,54 +21,115 @@ const CurrencyConverter = () => {
   const [openFrom, setOpenFrom] = useState(false);
   const [openTo, setOpenTo] = useState(false);
 
+  // Fetch currencies when the component mounts
   useEffect(() => {
+    let isMounted = true; // Track component mount status
+    console.log("Fetching currencies...");
+
+    const fetchCurrencies = async () => {
+      try {
+        console.log("Making API request for currencies...");
+        const response = await axios.get(
+          "https://api.exchangerate-api.com/v4/latest/USD",
+          { timeout: 5000 } // Set a timeout of 5 seconds
+        );
+        console.log("API response received:", response);
+
+        // Check if the response data is valid
+        if (response && response.data && response.data.rates) {
+          console.log("Valid response data found. Extracting currencies...");
+          if (isMounted) {
+            const currencyList = Object.keys(response.data.rates).map(
+              (currency) => ({
+                label: currency,
+                value: currency,
+              })
+            );
+            console.log("Currencies extracted:", currencyList);
+            setCurrencies(currencyList);
+            setLoading(false);
+          }
+        } else {
+          console.log("Invalid data from API:", response);
+          setError("Invalid data from API");
+          setLoading(false);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error("Error fetching currencies:", error);
+          setError("Failed to fetch currencies");
+          setLoading(false);
+        }
+      }
+    };
+
     fetchCurrencies();
+
+    // Cleanup if component is unmounted
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // Convert currency when the amount or currency changes
   useEffect(() => {
     if (fromCurrency && toCurrency) {
+      console.log(
+        `Converting currency: ${amount} ${fromCurrency} to ${toCurrency}`
+      );
       convertCurrency();
     }
   }, [amount, fromCurrency, toCurrency]);
 
-  const fetchCurrencies = async () => {
-    try {
-      const response = await axios.get(
-        "https://api.exchangerate-api.com/v4/latest/USD"
-      );
-      const currencyList = Object.keys(response.data.rates).map((currency) => ({
-        label: currency,
-        value: currency,
-      }));
-      setCurrencies(currencyList);
-      setLoading(false);
-    } catch (error) {
-      setError("Failed to fetch currencies");
-      setLoading(false);
-      console.error(error);
-    }
-  };
-
   const convertCurrency = async () => {
     try {
-      const response = await axios.get(
-        `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`
+      console.log(
+        `Making conversion request for ${fromCurrency} to ${toCurrency}...`
       );
-      const rate = response.data.rates[toCurrency];
-      setResult((amount * rate).toFixed(2));
+      const response = await axios.get(
+        `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`,
+        { timeout: 5000 } // Set a timeout of 5 seconds
+      );
+      console.log("Conversion API response received:", response);
+
+      if (response && response.data && response.data.rates) {
+        const rate = response.data.rates[toCurrency];
+        console.log(`Conversion rate: ${rate}`);
+        if (rate) {
+          setResult((amount * rate).toFixed(2));
+        } else {
+          console.log(`No rate found for ${toCurrency}`);
+          setError(`No conversion rate found for ${toCurrency}`);
+        }
+      } else {
+        console.log("Invalid conversion data:", response);
+        setError("Failed to convert currency");
+      }
     } catch (error) {
+      console.error("Error converting currency:", error);
       setError("Failed to convert currency");
-      console.error(error);
     }
   };
 
+  // Show loading indicator if currencies are being fetched
   if (loading) {
+    console.log("Loading... waiting for currencies.");
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
+  // Show error message if there's an error fetching currencies
   if (error) {
+    console.log("Error:", error);
     return <Text style={styles.error}>{error}</Text>;
   }
+
+  // Check if currencies is empty
+  if (currencies.length === 0) {
+    console.log("Currencies list is empty.");
+    return <Text style={styles.error}>No currencies available</Text>;
+  }
+
+  console.log("Rendering UI with currencies and selected values:", currencies);
 
   return (
     <View style={styles.container}>
@@ -81,20 +143,20 @@ const CurrencyConverter = () => {
       >
         FOREX CONVERTER
       </Text>
-      <View
-        style={{
-          width: "100%",
-          flexDirection: "row",
-        }}
-      >
+      <View style={{ width: "100%", flexDirection: "row" }}>
         <TextInput
           style={styles.input}
-          keyboardType="numbers-and-punctuations"
+          keyboardType="numbers-and-punctuation"
           value={amount}
-          onChangeText={setAmount}
+          onChangeText={(text) => {
+            console.log("Amount changed to:", text);
+            setAmount(text);
+          }}
+          editable={true}
         />
         <TextInput style={styles.input} value={result} editable={false} />
       </View>
+
       <View style={styles.dropdownWrapper}>
         <DropDownPicker
           open={openFrom}
@@ -108,8 +170,8 @@ const CurrencyConverter = () => {
           dropDownContainerStyle={styles.dropdownContainer}
           dropdownStyle={styles.dropdownStyle}
           onChangeValue={(value) => {
+            console.log("From Currency selected:", value);
             setFromCurrency(value);
-            console.log("Selected From Currency:", value);
           }}
         />
         <DropDownPicker
@@ -124,14 +186,14 @@ const CurrencyConverter = () => {
           dropDownContainerStyle={styles.dropdownContainer}
           dropdownStyle={styles.dropdownStyle}
           onChangeValue={(value) => {
+            console.log("To Currency selected:", value);
             setToCurrency(value);
-            console.log("Selected To Currency:", value);
           }}
         />
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -153,25 +215,25 @@ const styles = StyleSheet.create({
     color: "black",
   },
   dropdownWrapper: {
-    flexDirection: "row", // Ensure horizontal layout
-    justifyContent: "flex-between", // Space out dropdowns
-    width: "50%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center", // Align dropdowns vertically
+    width: "100%",
   },
   dropdown: {
-    width: "90%", // Adjust as needed to fit side-by-side,
-    marginHorizontal: 8,
-  },
-  dropdownStyle: {
-    width: "100%", // Dropdown list width
+    flex: 1, // Take equal space for alignment
+    marginHorizontal: 5, // Add some spacing
+    height: 40, // Match the height of the TextInput for consistency
   },
   dropdownContainer: {
-    width: "100%", // Container width for the dropdown
-    height: 100,
+    width: "100%",
+    zIndex: 1000, // Prevent overlap issues
+  },
+  dropdownStyle: {
+    backgroundColor: "#fff",
   },
   error: {
     color: "red",
     textAlign: "center",
   },
 });
-
-export default CurrencyConverter;

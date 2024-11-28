@@ -89,14 +89,14 @@ export default function Index() {
     }
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      router.replace("/"); // Adjust the path as needed
-    } catch (error) {
-      console.error("Error signing out: ", error);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await signOut(auth);
+  //     router.replace("/"); // Adjust the path as needed
+  //   } catch (error) {
+  //     console.error("Error signing out: ", error);
+  //   }
+  // };
 
   const renderItem = ({ item }) => (
     <View style={styles.item}>
@@ -183,7 +183,7 @@ export default function Index() {
           }
           ListFooterComponent={
             <View style={{ width: "100%" }}>
-              <CurrencyConverter />
+              {/* <CurrencyConverter /> */}
               <View style={styles.buttonRow}>
                 <TouchableOpacity
                   style={styles.buttonContainer}
@@ -212,6 +212,7 @@ export default function Index() {
             </View>
           }
         />
+        <SafeAreaView style={styles.androidSafeArea} />
       </ImageBackground>
     </TouchableWithoutFeedback>
   );
