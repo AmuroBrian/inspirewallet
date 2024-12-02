@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
     overflow: "visible",
+    zIndex: 1000,
   },
   input: {
     flex: 1,

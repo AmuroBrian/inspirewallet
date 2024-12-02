@@ -37,7 +37,7 @@ export default function Index() {
       title: "Available Balance",
       iconSource: require("../../assets/images/investmentprofile.png"),
       routeData: () => {
-        router.push("investmentprofile");
+        router.push("availablebalance");
       },
     },
     {

@@ -24,6 +24,8 @@ import {
 } from "firebase/firestore";
 import InvestmentProfileButtons from "../../components/InvestmentProfileButtons";
 import AmountContent from "../../components/AmountContent";
+import AvailBalanceContent from "../../components/AvailBalanceContent";
+import TransactionHistory from "../../components/TransactionHistory";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -66,7 +68,18 @@ export default function Index() {
       <SafeAreaView style={styles.androidSafeArea} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.mainContainer}>
-          <InvestmentProfileButtons userId={userId} />
+          <AvailBalanceContent availBalanceAmount={data.availBalanceAmount} />
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={() => router.push("withdraw")}
+            >
+              <Text style={{ color: "#00a651", fontWeight: "500" }}>
+                WITHDRAW
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <TransactionHistory userId={userId} />
         </View>
       </TouchableWithoutFeedback>
       <SafeAreaView style={styles.androidSafeArea} />

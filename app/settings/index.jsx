@@ -62,7 +62,7 @@ export default function Index() {
   const DATA = [
     {
       id: "1",
-      title: "Available Balance",
+      title: "Investment Profile",
       iconSource: require("../../assets/images/investmentprofile.png"),
       routeData: () => {
         router.push("investmentprofile");
@@ -96,17 +96,13 @@ export default function Index() {
       id: "5",
       title: "Maya",
       iconSource: require("../../assets/images/maya.png"),
-      routeData: () => {
-        openApp("paymaya://");
-      },
+      routeData: null,
     },
     {
       id: "6",
       title: "Gcash",
       iconSource: require("../../assets/images/gcash.png"),
-      routeData: () => {
-        openApp("gcash://");
-      },
+      routeData: null,
     },
     {
       id: "7",
@@ -130,7 +126,9 @@ export default function Index() {
       id: "10",
       title: "Events",
       iconSource: require("../../assets/images/event.png"),
-      routeData: null,
+      routeData: () => {
+        router.push("events");
+      },
     },
     {
       id: "11",
