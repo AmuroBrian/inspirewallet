@@ -13,10 +13,14 @@ import {
   Platform,
   ToastAndroid,
   Alert,
+  BackHandler,
 } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../configs/firebase";
+import { onSnapshot, doc } from "firebase/firestore";
+import { auth, app, firestore } from "../configs/firebase";
 import { useState, useEffect } from "react";
+import { Modal } from "react-native";
+import { BlurView } from "expo-blur";
 
 export default function Index() {
   const router = useRouter();
@@ -32,6 +36,98 @@ export default function Index() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isMaintenance, setIsMaintenance] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState("");
+
+  useEffect(() => {
+    const db = firestore; // Initialize Firestore
+    const docRef = doc(db, "appConfig", "maintenance"); // Reference to the maintenance document
+
+    // Set up a real-time listener for maintenance status
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const { isEnabled, message } = docSnap.data();
+          setIsMaintenance(isEnabled);
+          setMaintenanceMessage(message);
+        } else {
+          console.log("No maintenance document found.");
+          setIsMaintenance(false); // Default to no maintenance mode
+          setMaintenanceMessage(""); // Clear the message
+        }
+      },
+      (error) => {
+        console.error("Error listening for maintenance status changes:", error);
+      }
+    );
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
+  }, []);
+
+  if (isMaintenance) {
+    return (
+      <Modal transparent={true} animationType="fade" visible={isMaintenance}>
+        <ImageBackground
+          source={require("../assets/images/bgmain.png")}
+          style={style.container}
+        >
+          <BlurView
+            intensity={80}
+            tint="dark"
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 20,
+                borderRadius: 15,
+                alignItems: "center",
+                width: "80%",
+              }}
+            >
+              <Text
+                style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}
+              >
+                Maintenance Mode
+              </Text>
+              <Text
+                style={{ fontSize: 16, textAlign: "center", marginBottom: 20 }}
+              >
+                {maintenanceMessage}
+              </Text>
+              <TouchableOpacity
+                style={style.dismissButton}
+                onPress={() => {
+                  if (Platform.OS === "android") {
+                    BackHandler.exitApp();
+                  } else if (Platform.OS === "ios") {
+                    Alert.alert(
+                      "Exit App",
+                      "The app cannot close itself on iOS. Please close it manually.",
+                      [{ text: "OK" }]
+                    );
+                  }
+                }}
+              >
+                <Text style={style.dismissButtonText}>Dismiss</Text>
+              </TouchableOpacity>
+            </View>
+          </BlurView>
+        </ImageBackground>
+      </Modal>
+    );
+  }
 
   const SignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
@@ -260,5 +356,32 @@ const style = StyleSheet.create({
   androidSafeArea: {
     paddingTop: Platform.OS === "android" ? 25 : 0,
     opacity: 0,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  message: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  dismissButton: {
+    backgroundColor: "#ff4444",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  dismissButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
