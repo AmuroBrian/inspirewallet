@@ -25,6 +25,7 @@ import { signOut } from "firebase/auth";
 import WithdrawContent from "../../components/WithdrawContent";
 import USDTAmountContent from "../../components/USDTAmountContent";
 import IconButton from "../../components/IconButton";
+import AutoCarousel from "../../components/AutoCarousel";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -183,7 +184,7 @@ export default function Index() {
           }
           ListFooterComponent={
             <View style={{ width: "100%" }}>
-              <CurrencyConverter />
+              <AutoCarousel />
               <View style={styles.buttonRow}>
                 <TouchableOpacity
                   style={styles.buttonContainer}
