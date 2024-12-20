@@ -11,18 +11,18 @@ import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyD2MVTPMsY3XlgzcIjDWqfJTWP1CsdnFvY",
-  authDomain: "inspire-wallet.firebaseapp.com",
-  projectId: "inspire-wallet",
-  storageBucket: "inspire-wallet.appspot.com",
-  messagingSenderId: "1091026046056",
-  appId: "1:1091026046056:web:1440a666dad63cc9cb3fdd",
-  measurementId: "G-HSVD3JN0S9"
+    apiKey: "AIzaSyD2MVTPMsY3XlgzcIjDWqfJTWP1CsdnFvY",
+    authDomain: "inspire-wallet.firebaseapp.com",
+    projectId: "inspire-wallet",
+    storageBucket: "inspire-wallet.appspot.com",
+    messagingSenderId: "1091026046056",
+    appId: "1:1091026046056:web:1440a666dad63cc9cb3fdd",
+    measurementId: "G-HSVD3JN0S9"
 };
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
 export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });

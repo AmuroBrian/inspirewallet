@@ -48,7 +48,7 @@ export default function Index() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "MAYA",
+      headerTitle: "BDO",
     });
   }, []);
 
@@ -164,7 +164,7 @@ export default function Index() {
           >
             <Text style={{ padding: 10 }}>
               Please fill up the following form in order to request an open
-              account in Maya.
+              account in BDO.
             </Text>
 
             {/* TextInput Fields */}
@@ -245,7 +245,7 @@ export default function Index() {
                 mode={"date"}
                 is24Hour={true}
                 onChange={onChange}
-                display="compact"
+                display="spinner"
               />
             )}
 

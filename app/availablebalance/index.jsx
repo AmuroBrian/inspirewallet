@@ -26,6 +26,8 @@ import InvestmentProfileButtons from "../../components/InvestmentProfileButtons"
 import AmountContent from "../../components/AmountContent";
 import AvailBalanceContent from "../../components/AvailBalanceContent";
 import TransactionHistory from "../../components/TransactionHistory";
+import AutoCarousel from "../../components/AutoCarousel";
+import CurrencyConverter from "../../components/CurrencyConverter";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -55,7 +57,7 @@ export default function Index() {
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      headerTitle: "Investment Profile",
+      headerTitle: "Available Balance",
       headerTransparent: true,
     });
   }, []);
@@ -69,6 +71,8 @@ export default function Index() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.mainContainer}>
           <AvailBalanceContent availBalanceAmount={data.availBalanceAmount} />
+          <AutoCarousel />
+          <CurrencyConverter />
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.buttonContainer}

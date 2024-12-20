@@ -68,28 +68,30 @@ export default function Index() {
       id: "6",
       title: "BDO",
       iconSource: require("../../assets/images/bdo.png"),
-      routeData: null,
+      routeData: () => {
+        router.push("bdo");
+      },
     },
+    // {
+    //   id: "7",
+    //   title: "NFT",
+    //   iconSource: require("../../assets/images/nft.png"),
+    //   routeData: null,
+    // },
     {
       id: "7",
-      title: "NFT",
-      iconSource: require("../../assets/images/nft.png"),
-      routeData: null,
-    },
-    {
-      id: "8",
       title: "Crypto",
       iconSource: require("../../assets/images/crypto.png"),
       routeData: null,
     },
+    // {
+    //   id: "9",
+    //   title: "FX Trading",
+    //   iconSource: require("../../assets/images/fx.png"),
+    //   routeData: null,
+    // },
     {
-      id: "9",
-      title: "FX Trading",
-      iconSource: require("../../assets/images/fx.png"),
-      routeData: null,
-    },
-    {
-      id: "10",
+      id: "8",
       title: "Events",
       iconSource: require("../../assets/images/event.png"),
       routeData: () => {
@@ -97,13 +99,13 @@ export default function Index() {
       },
     },
     {
-      id: "11",
+      id: "9",
       title: "Travel",
       iconSource: require("../../assets/images/travel.png"),
       routeData: null,
     },
     {
-      id: "12",
+      id: "10",
       title: "Privacy Policy",
       iconSource: require("../../assets/images/privacypolicy.png"),
       routeData: () => {
@@ -111,7 +113,7 @@ export default function Index() {
       },
     },
     {
-      id: "13",
+      id: "11",
       title: "Terms & Conditions",
       iconSource: require("../../assets/images/termsandcondition.png"),
       routeData: () => {
@@ -119,7 +121,7 @@ export default function Index() {
       },
     },
     {
-      id: "14",
+      id: "12",
       title: "About Us",
       iconSource: require("../../assets/images/aboutus.png"),
       routeData: () => {
@@ -127,7 +129,7 @@ export default function Index() {
       },
     },
     {
-      id: "15",
+      id: "13",
       title: "Help Center",
       iconSource: require("../../assets/images/helpcenter.png"),
       routeData: () => {

@@ -1,16 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Image, StyleSheet, Animated, Dimensions } from "react-native";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { useRouter } from "expo-router";
 
 const images = [
-  require("../assets/images/xmasads.png"),
-  require("../assets/images/mayaads.png"),
-  require("../assets/images/bdoads.png"),
+  { src: require("../assets/images/xmasads.png"), route: null }, // Set to null to simulate error
+  { src: require("../assets/images/mayaads.png"), route: "/maya" },
+  { src: require("../assets/images/bdoads.png"), route: "/bdo" },
 ];
 
 const AutoCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
   const screenWidth = Dimensions.get("window").width;
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,19 +36,35 @@ const AutoCarousel = () => {
     return () => clearInterval(interval);
   }, [currentIndex, translateX, screenWidth]);
 
+  const handlePress = (route) => {
+    try {
+      if (!route) {
+        throw new Error("Route not defined"); // Simulate an error for null routes
+      }
+      router.push(route);
+    } catch (error) {
+      console.log("XMAS");
+    }
+  };
+
   return (
     <View style={styles.carouselContainer}>
       <Animated.View
         style={[
           styles.carouselImages,
           {
-            width: images.length,
+            width: images.length * (screenWidth - 30),
             transform: [{ translateX }],
           },
         ]}
       >
         {images.map((image, index) => (
-          <Image key={index} source={image} style={styles.carouselImage} />
+          <TouchableOpacity
+            key={index}
+            onPress={() => handlePress(image.route)}
+          >
+            <Image source={image.src} style={styles.carouselImage} />
+          </TouchableOpacity>
         ))}
       </Animated.View>
     </View>

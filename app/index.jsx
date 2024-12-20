@@ -179,7 +179,7 @@ export default function Index() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground
-        source={require("../assets/images/bgmain.png")}
+        source={require("../assets/images/bg2.png")}
         style={style.container}
       >
         <SafeAreaView style={style.androidSafeArea} />
