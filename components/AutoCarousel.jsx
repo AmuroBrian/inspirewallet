@@ -31,7 +31,7 @@ const AutoCarousel = () => {
         useNativeDriver: true,
       }).start();
       setCurrentIndex(nextIndex);
-    }, 2000); // Scroll every 2 seconds
+    }, 5000); // Scroll every 2 seconds
 
     return () => clearInterval(interval);
   }, [currentIndex, translateX, screenWidth]);
