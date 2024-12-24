@@ -245,7 +245,7 @@ export default function Index() {
                 mode={"date"}
                 is24Hour={true}
                 onChange={onChange}
-                display="spinner"
+                display="compact"
               />
             )}
 
