@@ -18,10 +18,7 @@ import { useNavigation } from "expo-router";
 import { auth, firestore } from "../../configs/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import AmountContent from "../../components/AmountContent";
-import StockContent from "../../components/StockContent";
-import CurrencyConverter from "../../components/CurrencyConverter";
 import { useRouter } from "expo-router";
-import { signOut } from "firebase/auth";
 import WithdrawContent from "../../components/WithdrawContent";
 import USDTAmountContent from "../../components/USDTAmountContent";
 import IconButton from "../../components/IconButton";
@@ -142,7 +139,7 @@ export default function Index() {
                   style={{
                     alignSelf: "flex-start",
                     padding: 5,
-                    fontSize: 25,
+                    fontSize: 20,
                     fontWeight: "900",
                     width: width,
                   }}

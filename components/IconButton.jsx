@@ -1,13 +1,22 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image, PixelRatio } from "react-native";
 
 export default function IconButton({ title, iconSource, onPress }) {
+  const scaleFont = (size) => {
+    const scale = PixelRatio.getFontScale();
+    return size * scale;
+  };
   return (
     <TouchableOpacity style={styles.buttonContainer} onPress={onPress}>
       <View style={styles.iconContainer}>
         <Image source={iconSource} style={styles.icon} />
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={{
+        fontSize: scaleFont(12),
+        fontWeight: "bold",
+        color: "#00a651",
+        textAlign: "center",
+        }}>{title}</Text>
     </TouchableOpacity>
   );
 }
