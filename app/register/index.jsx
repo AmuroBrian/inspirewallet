@@ -93,9 +93,10 @@ export default function Index() {
         lastName,
         stockAmount: 0,
         walletAmount: 0,
-        withdrawAmount: 0,
+        timeDepositAmount: 0,
         agentWalletAmount: 0,
         usdtAmount: 0,
+        availBalanceAmount: 0,
       });
 
       await addDoc(collection(firestore, "users", user.uid, "transactions"), {

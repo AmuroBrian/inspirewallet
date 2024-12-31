@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, PixelRatio } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  PixelRatio,
+} from "react-native";
 
 export default function IconButton({ title, iconSource, onPress }) {
   const scaleFont = (size) => {
@@ -11,12 +18,16 @@ export default function IconButton({ title, iconSource, onPress }) {
       <View style={styles.iconContainer}>
         <Image source={iconSource} style={styles.icon} />
       </View>
-      <Text style={{
-        fontSize: scaleFont(12),
-        fontWeight: "bold",
-        color: "#00a651",
-        textAlign: "center",
-        }}>{title}</Text>
+      <Text
+        style={{
+          fontSize: scaleFont(12),
+          fontWeight: "bold",
+          color: "white",
+          textAlign: "center",
+        }}
+      >
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -25,7 +36,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: 100,
     height: 100,
-    backgroundColor: "#ddf6e1",
+    backgroundColor: "#cc2135",
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",

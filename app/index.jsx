@@ -21,11 +21,14 @@ import { auth, app, firestore } from "../configs/firebase";
 import { useState, useEffect } from "react";
 import { Modal } from "react-native";
 import { BlurView } from "expo-blur";
+// import messaging from "@react-native-firebase/messaging";
+import { Colors } from "../constants/Colors";
 
 export default function Index() {
   const router = useRouter();
   const navigation = useNavigation();
   const auth = getAuth();
+  const isDeveloper = true;
 
   useEffect(() => {
     navigation.setOptions({
@@ -66,7 +69,7 @@ export default function Index() {
     return () => unsubscribe();
   }, []);
 
-  if (isMaintenance) {
+  if (isMaintenance && !isDeveloper) {
     return (
       <Modal transparent={true} animationType="fade" visible={isMaintenance}>
         <ImageBackground
@@ -131,7 +134,7 @@ export default function Index() {
 
   const SignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
+      .then(async (userCredentials) => {
         const user = userCredentials.user;
         router.replace("/main");
       })
@@ -243,7 +246,7 @@ export default function Index() {
                 style={{
                   width: "90%",
                   height: 50,
-                  backgroundColor: "#ddf6e1",
+                  backgroundColor: Colors.newYearTheme.background,
                   borderRadius: 25,
                   justifyContent: "center",
                   alignItems: "center",
@@ -253,7 +256,7 @@ export default function Index() {
               >
                 <Text
                   style={{
-                    color: "#00a651",
+                    color: Colors.newYearTheme.text,
                     fontWeight: 800,
                   }}
                 >

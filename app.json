@@ -2,7 +2,7 @@
   "expo": {
     "name": "Inspire Wallet",
     "slug": "investor-wallet",
-    "version": "1.5.8",
+    "version": "1.5.9",
     "orientation": "portrait",
     "icon": "./assets/images/applogo.png",
     "scheme": "myapp",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.inspire.inspirewallet",
-      "buildNumber": "24"
+      "buildNumber": "25"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +24,7 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.inspire.inspirewallet",
-      "versionCode": "19",
+      "versionCode": "20",
       "permissions": [
         "INTERNET"
       ]

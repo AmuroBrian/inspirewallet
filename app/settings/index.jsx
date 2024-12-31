@@ -34,7 +34,7 @@ export default function Index() {
     },
     {
       id: "2",
-      title: "Agent Dashboard",
+      title: "Agent",
       iconSource: require("../../assets/images/agentdashboard.png"),
       routeData: () => {
         router.push("agentdashboard");
@@ -42,7 +42,7 @@ export default function Index() {
     },
     {
       id: "3",
-      title: "Stockholder Dashboard",
+      title: "Stockholder",
       iconSource: require("../../assets/images/stock.png"),
       routeData: () => {
         router.push("stockholder");

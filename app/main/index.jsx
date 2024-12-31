@@ -23,16 +23,18 @@ import WithdrawContent from "../../components/WithdrawContent";
 import USDTAmountContent from "../../components/USDTAmountContent";
 import IconButton from "../../components/IconButton";
 import AutoCarousel from "../../components/AutoCarousel";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
   const router = useRouter();
   const width = Dimensions.get("window").width;
 
+  // Sample navigation data
   const DATA = [
     {
       id: "1",
-      title: "Available Balance",
+      title: "Balance",
       iconSource: require("../../assets/images/investmentprofile.png"),
       routeData: () => {
         router.push("availablebalance");
@@ -40,7 +42,7 @@ export default function Index() {
     },
     {
       id: "2",
-      title: "Agent Dashboard",
+      title: "Agent",
       iconSource: require("../../assets/images/agentdashboard.png"),
       routeData: () => {
         router.push("agentdashboard");
@@ -48,7 +50,7 @@ export default function Index() {
     },
     {
       id: "3",
-      title: "Stockholder Dashboard",
+      title: "Stockholder",
       iconSource: require("../../assets/images/stock.png"),
       routeData: () => {
         router.push("stockholder");
@@ -56,15 +58,9 @@ export default function Index() {
     },
   ];
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-      headerTitle: "Dashboard",
-    });
-  }, []);
+  const [data, setUserData] = useState({}); // State to hold user data
 
-  const [data, setUserData] = useState({});
-
+  // Fetch user data on component mount
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
@@ -73,7 +69,7 @@ export default function Index() {
         userRef,
         (userDoc) => {
           if (userDoc.exists()) {
-            setUserData(userDoc.data());
+            setUserData(userDoc.data()); // Update state with user data
           } else {
             Alert.alert("Error", "No user data found");
           }
@@ -87,15 +83,15 @@ export default function Index() {
     }
   }, []);
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await signOut(auth);
-  //     router.replace("/"); // Adjust the path as needed
-  //   } catch (error) {
-  //     console.error("Error signing out: ", error);
-  //   }
-  // };
+  // Set navigation options
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+      headerTitle: "Dashboard",
+    });
+  }, []);
 
+  // Render individual navigation items
   const renderItem = ({ item }) => (
     <View style={styles.item}>
       <IconButton
@@ -126,6 +122,7 @@ export default function Index() {
           style={styles.list}
           ListHeaderComponent={
             <View style={styles.mainContainer}>
+              {/* Display user greeting */}
               <View
                 style={{
                   width: "100%",
@@ -144,9 +141,11 @@ export default function Index() {
                     width: width,
                   }}
                 >
-                  Hi! {data.firstName} {data.lastName}
+                  Hi! {data.firstName || "User"} {data.lastName || ""}
                 </Text>
               </View>
+
+              {/* Menu Button */}
               <View
                 style={{
                   alignItems: "flex-end",
@@ -157,7 +156,7 @@ export default function Index() {
               >
                 <TouchableOpacity
                   style={{
-                    backgroundColor: "#ddf6e1",
+                    backgroundColor: Colors.newYearTheme.background,
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 10,
@@ -169,14 +168,16 @@ export default function Index() {
                     router.push("settings");
                   }}
                 >
-                  <Text style={{ color: "#00a651", fontWeight: "800" }}>
+                  <Text style={{ color: "white", fontWeight: "800" }}>
                     MENU
                   </Text>
                 </TouchableOpacity>
               </View>
-              <AmountContent walletAmount={data.walletAmount} />
-              <USDTAmountContent usdtAmount={data.usdtAmount} />
-              <WithdrawContent withdrawAmount={data.withdrawAmount} />
+
+              {/* Other Components */}
+              <AmountContent walletAmount={data.timeDepositAmount || 0} />
+              <USDTAmountContent usdtAmount={data.usdtAmount || 0} />
+              <WithdrawContent withdrawAmount={data.walletAmount || 0} />
             </View>
           }
           ListFooterComponent={
@@ -187,7 +188,12 @@ export default function Index() {
                   style={styles.buttonContainer}
                   onPress={() => router.push("deposit")}
                 >
-                  <Text style={{ color: "#00a651", fontWeight: "500" }}>
+                  <Text
+                    style={{
+                      color: Colors.newYearTheme.text,
+                      fontWeight: "500",
+                    }}
+                  >
                     DEPOSIT
                   </Text>
                 </TouchableOpacity>
@@ -195,7 +201,12 @@ export default function Index() {
                   style={styles.buttonContainer}
                   onPress={() => router.push("withdraw")}
                 >
-                  <Text style={{ color: "#00a651", fontWeight: "500" }}>
+                  <Text
+                    style={{
+                      color: Colors.newYearTheme.text,
+                      fontWeight: "500",
+                    }}
+                  >
                     WITHDRAW
                   </Text>
                 </TouchableOpacity>
@@ -235,7 +246,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     height: 40,
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
@@ -269,7 +280,7 @@ const styles = StyleSheet.create({
   },
   historyButton: {
     width: "100%",
-    backgroundColor: "#f4e7ff",
+    backgroundColor: Colors.newYearTheme.background,
     borderRadius: 15,
     padding: 10,
     marginTop: 30,
@@ -279,7 +290,7 @@ const styles = StyleSheet.create({
   historyText: {
     fontSize: 15,
     textAlign: "center",
-    color: "black",
-    fontWeight: "800",
+    color: Colors.newYearTheme.text,
+    fontWeight: "500",
   },
 });
