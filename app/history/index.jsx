@@ -55,7 +55,7 @@ export default function Index() {
 
   return (
     <ImageBackground
-      source={require("../../assets/images/bgmain.png")}
+      source={require("../../assets/images/bg2.png")}
       style={styles.container}
     >
       <SafeAreaView style={styles.androidSafeArea} />

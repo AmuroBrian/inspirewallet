@@ -5,26 +5,18 @@ import {
   ImageBackground,
   SafeAreaView,
   TouchableWithoutFeedback,
-  ScrollView,
   Keyboard,
   TouchableOpacity,
   Platform,
   Alert,
-  ToastAndroid,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useRouter, useNavigation } from "expo-router";
 import { auth, firestore } from "../../configs/firebase";
-import {
-  doc,
-  onSnapshot,
-  setDoc,
-  addDoc,
-  collection,
-} from "firebase/firestore";
-import TransactionDisplay from "../../components/AgentTransaction";
+import { doc, onSnapshot } from "firebase/firestore";
 import StockContent from "../../components/StockContent";
 import StockTransaction from "../../components/StockTransaction";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -109,7 +101,7 @@ const styles = StyleSheet.create({
   transferButton: {
     margin: 10,
     width: "95%",
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     height: 50,
     justifyContent: "center",
     borderRadius: 15,
@@ -129,7 +121,7 @@ const styles = StyleSheet.create({
   },
   transferText: {
     fontSize: 15,
-    color: "#00a651",
+    color: Colors.newYearTheme.text,
     textAlign: "center",
   },
   androidSafeArea: {

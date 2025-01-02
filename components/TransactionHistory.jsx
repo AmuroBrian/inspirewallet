@@ -14,6 +14,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { app } from "../configs/firebase"; // Adjust import path
+import { Colors } from "../constants/Colors";
 
 const TransactionHistory = ({ userId }) => {
   const [transactions, setTransactions] = useState([]);
@@ -106,13 +107,13 @@ const TransactionHistory = ({ userId }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 12,
+    padding: 10,
     width: "100%",
     margin: 10,
   },
   transactionBox: {
     flexDirection: "row",
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     borderRadius: 15,
     marginBottom: 10,
     padding: 5,
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
   },
   transactionText: {
     fontSize: 15,
-    color: "#00a651",
+    color: Colors.newYearTheme.text,
   },
 });
 

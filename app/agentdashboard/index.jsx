@@ -24,6 +24,7 @@ import {
 } from "firebase/firestore";
 import AgentAmountContent from "../../components/AgentAmountContent";
 import TransactionDisplay from "../../components/AgentTransaction";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -99,14 +100,14 @@ const styles = StyleSheet.create({
   transferButton: {
     margin: 10,
     width: "95%",
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     height: 50,
     justifyContent: "center",
     borderRadius: 15,
   },
   transferText: {
     fontSize: 15,
-    color: "#00a651",
+    color: Colors.newYearTheme.text,
     textAlign: "center",
   },
   androidSafeArea: {

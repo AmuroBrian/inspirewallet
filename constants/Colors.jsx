@@ -27,4 +27,8 @@ export const Colors = {
     text: "white",
     background: "#cc2135",
   },
+  mayaTheme: {
+    text: "#00a651",
+    background: "#ddf6e1",
+  },
 };

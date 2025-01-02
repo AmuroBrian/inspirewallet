@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { collection, onSnapshot } from "firebase/firestore";
 import { firestore } from "./../configs/firebase";
+import { Colors } from "../constants/Colors";
 
 const EventComponents = () => {
   const [events, setEvents] = useState([]);
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   eventItem: {
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
   eventTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#00a651",
+    color: Colors.newYearTheme.text,
   },
   eventDetails: {
     fontSize: 14,

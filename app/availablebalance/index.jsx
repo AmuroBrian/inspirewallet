@@ -28,6 +28,7 @@ import AvailBalanceContent from "../../components/AvailBalanceContent";
 import TransactionHistory from "../../components/TransactionHistory";
 import AutoCarousel from "../../components/AutoCarousel";
 import CurrencyConverter from "../../components/CurrencyConverter";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -78,7 +79,9 @@ export default function Index() {
               style={styles.buttonContainer}
               onPress={() => router.push("withdraw")}
             >
-              <Text style={{ color: "#00a651", fontWeight: "500" }}>
+              <Text
+                style={{ color: Colors.newYearTheme.text, fontWeight: "500" }}
+              >
                 WITHDRAW
               </Text>
             </TouchableOpacity>
@@ -129,7 +132,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
     height: 40,
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",

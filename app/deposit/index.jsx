@@ -23,6 +23,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import DropDownPicker from "react-native-dropdown-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const db = getFirestore();
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     width: "70%",
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     padding: 10,
     borderRadius: 15,
     margin: 20,
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "100%",
     fontSize: 15,
-    color: "#00a651",
+    color: Colors.newYearTheme.text,
     fontWeight: "600",
   },
   submitPaypalButton: {

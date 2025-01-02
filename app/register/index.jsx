@@ -22,6 +22,7 @@ import { useNavigation, useRouter } from "expo-router";
 import { auth, firestore } from "../../configs/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, doc, setDoc, addDoc } from "firebase/firestore";
+import { Colors } from "../../constants/Colors";
 
 const { width } = Dimensions.get("window");
 
@@ -161,7 +162,7 @@ export default function Index() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground
-        source={require("../../assets/images/bgmain.png")}
+        source={require("../../assets/images/bg2.png")}
         style={styles.container}
       >
         <KeyboardAvoidingView
@@ -170,7 +171,10 @@ export default function Index() {
         >
           <SafeAreaView style={styles.androidSafeArea} />
           {loading ? (
-            <ActivityIndicator size="large" color="green" />
+            <ActivityIndicator
+              size="large"
+              color={Colors.newYearTheme.background}
+            />
           ) : (
             <ScrollView
               contentContainerStyle={styles.formContainer}
@@ -306,18 +310,18 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   eyeButtonText: {
-    color: "green",
+    color: Colors.newYearTheme.background,
   },
   submitButton: {
     width: width * 0.95,
-    backgroundColor: "#00a651",
+    backgroundColor: Colors.newYearTheme.background,
     padding: 15,
     alignItems: "center",
     borderRadius: 25,
     marginTop: 20,
   },
   submitButtonText: {
-    color: "white",
+    color: Colors.newYearTheme.text,
     fontSize: 20,
     fontWeight: "bold",
   },

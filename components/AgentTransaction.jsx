@@ -14,6 +14,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { app } from "../configs/firebase"; // Adjust the import path if necessary
+import { Colors } from "../constants/Colors";
 
 export default function TransactionDisplay({ userId }) {
   const [transactions, setTransactions] = useState([]);
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
   },
   transactionBox: {
     flexDirection: "row",
-    backgroundColor: "#ddf6e1",
+    backgroundColor: Colors.newYearTheme.background,
     borderRadius: 15,
     marginBottom: 10,
     padding: 5,
@@ -137,6 +138,6 @@ const styles = StyleSheet.create({
   },
   transactionText: {
     fontSize: 15,
-    color: "#00a651",
+    color: Colors.newYearTheme.text,
   },
 });

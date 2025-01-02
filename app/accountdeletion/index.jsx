@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { useNavigation } from "expo-router";
 import { send, EmailJSResponseStatus } from "@emailjs/react-native";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -144,7 +145,7 @@ export default function Index() {
             <TouchableOpacity
               style={{
                 width: "70%",
-                backgroundColor: "#ddf6e1",
+                backgroundColor: Colors.newYearTheme.background,
                 padding: 10,
                 borderRadius: 15,
                 margin: 20,
@@ -157,7 +158,7 @@ export default function Index() {
                   textAlign: "center",
                   width: "100%",
                   fontSize: 15,
-                  color: "#00a651",
+                  color: Colors.newYearTheme.text,
                   fontWeight: 600,
                 }}
               >
