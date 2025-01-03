@@ -35,7 +35,20 @@
       "favicon": "./assets/images/images/applogo.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "excludedPackages": [
+              "co.apptailor.googlesignin"
+            ]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
