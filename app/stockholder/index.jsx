@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   transferButton: {
     margin: 10,
     width: "95%",
-    backgroundColor: Colors.newYearTheme.background,
+    backgroundColor: "green",
     height: 50,
     justifyContent: "center",
     borderRadius: 15,

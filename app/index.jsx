@@ -28,7 +28,6 @@ export default function Index() {
   const router = useRouter();
   const navigation = useNavigation();
   const auth = getAuth();
-  const isDeveloper = true;
 
   useEffect(() => {
     navigation.setOptions({
@@ -41,6 +40,11 @@ export default function Index() {
   const [password, setPassword] = useState("");
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
+  const [isDeveloper, setIsDeveloper] = useState(false);
+
+  useEffect(() => {
+    setIsDeveloper(false);
+  }, []);
 
   useEffect(() => {
     const db = firestore; // Initialize Firestore
@@ -69,11 +73,15 @@ export default function Index() {
     return () => unsubscribe();
   }, []);
 
-  if (isMaintenance && !isDeveloper) {
+  if (isMaintenance || isDeveloper) {
     return (
-      <Modal transparent={true} animationType="fade" visible={isMaintenance}>
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isMaintenance || isDeveloper}
+      >
         <ImageBackground
-          source={require("../assets/images/bgmain.png")}
+          source={require("../assets/images/bg2.png")}
           style={style.container}
         >
           <BlurView

@@ -31,4 +31,9 @@ export const Colors = {
     text: "#00a651",
     background: "#ddf6e1",
   },
+  hollowButton: {
+    color: "black",
+    borderWidth: 2,
+    borderColor: "black",
+  },
 };

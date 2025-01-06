@@ -185,12 +185,12 @@ export default function Index() {
               <AutoCarousel />
               <View style={styles.buttonRow}>
                 <TouchableOpacity
-                  style={styles.buttonContainer}
+                  style={styles.hollowButton}
                   onPress={() => router.push("deposit")}
                 >
                   <Text
                     style={{
-                      color: Colors.newYearTheme.text,
+                      color: "black",
                       fontWeight: "500",
                     }}
                   >
@@ -198,12 +198,12 @@ export default function Index() {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.buttonContainer}
+                  style={styles.hollowButton}
                   onPress={() => router.push("withdraw")}
                 >
                   <Text
                     style={{
-                      color: Colors.newYearTheme.text,
+                      color: "black",
                       fontWeight: "500",
                     }}
                   >
@@ -292,5 +292,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Colors.newYearTheme.text,
     fontWeight: "500",
+  },
+  hollowButton: {
+    flex: 1,
+    height: 40,
+    backgroundColor: "transparent",
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 5,
+    borderColor: "black",
+    borderWidth: 2,
   },
 });
