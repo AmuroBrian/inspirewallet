@@ -24,6 +24,11 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
   newYearTheme: {
+    text: "#cc2135",
+    // background: "#cc2135",
+    background: "white",
+  },
+  redTheme: {
     text: "white",
     background: "#cc2135",
   },

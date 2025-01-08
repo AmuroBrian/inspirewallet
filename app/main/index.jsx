@@ -163,12 +163,22 @@ export default function Index() {
                     borderRadius: 10,
                     height: 40,
                     width: width * 0.25,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 3,
+                    elevation: 5,
                   }}
                   onPress={() => {
                     router.push("settings");
                   }}
                 >
-                  <Text style={{ color: "white", fontWeight: "800" }}>
+                  <Text
+                    style={{
+                      color: Colors.newYearTheme.text,
+                      fontWeight: "800",
+                    }}
+                  >
                     MENU
                   </Text>
                 </TouchableOpacity>
@@ -286,6 +296,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
     height: 40,
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   historyText: {
     fontSize: 15,

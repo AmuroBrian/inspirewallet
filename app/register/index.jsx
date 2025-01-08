@@ -319,6 +319,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 25,
     marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   submitButtonText: {
     color: Colors.newYearTheme.text,

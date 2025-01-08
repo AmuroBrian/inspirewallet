@@ -7,6 +7,7 @@ import {
   Image,
   PixelRatio,
 } from "react-native";
+import { Colors } from "../constants/Colors";
 
 export default function IconButton({ title, iconSource, onPress }) {
   const scaleFont = (size) => {
@@ -22,7 +23,7 @@ export default function IconButton({ title, iconSource, onPress }) {
         style={{
           fontSize: scaleFont(12),
           fontWeight: "bold",
-          color: "white",
+          color: Colors.newYearTheme.text,
           textAlign: "center",
         }}
       >
@@ -34,9 +35,9 @@ export default function IconButton({ title, iconSource, onPress }) {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: 100,
-    height: 100,
-    backgroundColor: "#cc2135",
+    width: 120,
+    height: 120,
+    backgroundColor: Colors.newYearTheme.background,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#00a651",
+    color: "red",
     textAlign: "center",
   },
 });

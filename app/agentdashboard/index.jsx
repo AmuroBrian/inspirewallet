@@ -104,6 +104,11 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     borderRadius: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   transferText: {
     fontSize: 15,

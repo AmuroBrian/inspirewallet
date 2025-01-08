@@ -178,6 +178,11 @@ export default function Index() {
                   borderRadius: 15,
                   margin: 20,
                   alignSelf: "center",
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 3,
+                  elevation: 5,
                 }}
                 onPress={onSubmit}
               >

@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   },
   transferText: {
     fontSize: 15,
-    color: Colors.newYearTheme.text,
+    color: "white",
     textAlign: "center",
   },
   androidSafeArea: {

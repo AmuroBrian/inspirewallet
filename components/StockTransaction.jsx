@@ -130,6 +130,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 50,
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   transactionItem: {
     flex: 1,

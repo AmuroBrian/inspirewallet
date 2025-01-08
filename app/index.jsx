@@ -254,7 +254,7 @@ export default function Index() {
                 style={{
                   width: "90%",
                   height: 50,
-                  backgroundColor: Colors.newYearTheme.background,
+                  backgroundColor: Colors.redTheme.background,
                   borderRadius: 25,
                   justifyContent: "center",
                   alignItems: "center",
@@ -264,7 +264,7 @@ export default function Index() {
               >
                 <Text
                   style={{
-                    color: Colors.newYearTheme.text,
+                    color: Colors.redTheme.text,
                     fontWeight: 800,
                   }}
                 >
