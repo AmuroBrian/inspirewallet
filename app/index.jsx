@@ -21,6 +21,7 @@ import { auth, app, firestore } from "../configs/firebase";
 import { useState, useEffect } from "react";
 import { Modal } from "react-native";
 import { BlurView } from "expo-blur";
+// import messaging from "@react-native-firebase/messaging";
 import { Colors } from "../constants/Colors";
 
 export default function Index() {
