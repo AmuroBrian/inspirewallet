@@ -21,7 +21,11 @@ import { auth, app, firestore } from "../configs/firebase";
 import { useState, useEffect } from "react";
 import { Modal } from "react-native";
 import { BlurView } from "expo-blur";
+// import messaging from "@react-native-firebase/messaging";
 import { Colors } from "../constants/Colors";
+// import * as Notifications from "expo-notifications";
+// import * as Device from "expo-device";
+// import Constants from "expo-constants";
 
 export default function Index() {
   const router = useRouter();
@@ -40,6 +44,7 @@ export default function Index() {
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
   const [isDeveloper, setIsDeveloper] = useState(false);
+  // const [expoPushToken, setExpoPushToken] = useState("");
 
   useEffect(() => {
     setIsDeveloper(false);
@@ -71,6 +76,38 @@ export default function Index() {
     // Clean up the listener when the component unmounts
     return () => unsubscribe();
   }, []);
+
+  // useEffect(() => {
+  //   // Register for push notifications
+  //   registerForPushNotificationsAsync().then((token) => {
+  //     if (token) {
+  //       console.log(token);
+  //       setExpoPushToken(token);
+  //       saveTokenToFirestore(token); // Save token to Firestore
+  //     }
+  //   });
+
+  //   // Listen to incoming notifications
+  //   const subscription = Notifications.addNotificationReceivedListener(
+  //     (notification) => {
+  //       Alert.alert("Notification Received", notification.request.content.body);
+  //     }
+  //   );
+
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, []);
+
+  // const saveTokenToFirestore = async (token) => {
+  //   if (!auth.currentUser) return;
+
+  //   const uid = auth.currentUser.uid;
+  //   const db = getFirestore();
+  //   const userDocRef = doc(db, "users", uid);
+
+  //   await setDoc(userDocRef, { pushToken: token }, { merge: true });
+  // };
 
   if (isMaintenance || isDeveloper) {
     return (
@@ -186,6 +223,36 @@ export default function Index() {
       });
   };
 
+  async function registerForPushNotificationsAsync() {
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        Alert.alert("Failed to get push token for push notification!");
+        return null;
+      }
+
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      return token;
+    } else {
+      Alert.alert("Must use physical device for Push Notifications");
+      return null;
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+      });
+    }
+  }
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground

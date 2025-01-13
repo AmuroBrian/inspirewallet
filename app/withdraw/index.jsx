@@ -99,7 +99,7 @@ export default function Index() {
         process.env.EXPO_PUBLIC_TEMPLATE_ID,
         {
           emailAddress,
-          message: `Name: ${userData.firstName} ${userData.lastName}\nAmount: ${amount}\nEmail Address: ${emailAddress}\nBank Account Number: ${bankAccountNumber}\nBank Account Holder Name: ${bankAccountName}\nBank Name: ${bankName}\nBank Branch Name: ${branchName}`,
+          message: `Name: ${userData.firstName} ${userData.lastName}\nAmount: ${amount}\nEmail Address: ${emailAddress}\nBank Account Number: ${bankAccountNumber}\nBank Account Holder Name: ${bankAccountName}\nBank Name: ${bankName}\nBank Branch Name: ${branchName}\nType: ${type}`,
         },
         {
           publicKey: process.env.EXPO_PUBLIC_API_KEY,

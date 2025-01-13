@@ -2,7 +2,7 @@
   "expo": {
     "name": "Inspire Wallet",
     "slug": "investor-wallet",
-    "version": "1.6.4",
+    "version": "1.6.8",
     "orientation": "portrait",
     "icon": "./assets/images/applogo.png",
     "scheme": "myapp",
@@ -15,7 +15,17 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.inspire.inspirewallet",
-      "buildNumber": "29"
+      "buildNumber": "34",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification"
+        ],
+        "FirebaseAppDelegateProxyEnabled": false,
+        "UIBackgroundFetchIntervalMinimum": 15,
+        "NSLocationWhenInUseUsageDescription": "We need access to your location to provide personalized services.",
+        "NSCameraUsageDescription": "We need access to your camera to enable photo features.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload and share photos."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +34,7 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.inspire.inspirewallet",
-      "versionCode": "24",
+      "versionCode": "28",
       "permissions": [
         "INTERNET"
       ]
@@ -32,7 +42,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/images/applogo.png"
+      "favicon": "./assets/images/applogo.png"
     },
     "plugins": [
       "expo-router",

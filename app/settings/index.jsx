@@ -100,9 +100,11 @@ export default function Index() {
     },
     {
       id: "9",
-      title: "Travel",
+      title: "Travel Protection",
       iconSource: require("../../assets/images/travel.png"),
-      routeData: null,
+      routeData: () => {
+        router.push("travel");
+      },
     },
     {
       id: "10",
