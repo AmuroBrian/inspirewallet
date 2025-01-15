@@ -59,6 +59,7 @@ export default function Index() {
   const [showArrivalTime, setShowArrivalTime] = useState(false);
   const [showDepartureTime, setShowDepartureTime] = useState(false);
   const [imageUri, setImageUri] = useState(null);
+  const [imageGovtId, setImageGovtId] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [userAmount, setUserAmount] = useState(0);
@@ -160,6 +161,26 @@ export default function Index() {
     });
   };
 
+  selectGovtImage = async () => {
+    const options = {
+      mediaType: "photo",
+      maxWidth: 800,
+      maxHeight: 800,
+      quality: 0.8,
+    };
+
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log("User cancelled image picker");
+      } else if (response.errorCode) {
+        console.error("Image picker error:", response.errorMessage);
+      } else {
+        const uri = response.assets[0].uri;
+        setImageGovtId(uri);
+      }
+    });
+  };
+
   const uploadImage = async () => {
     if (!imageUri) {
       Alert.alert("Error", "Please select an image first.");
@@ -199,11 +220,50 @@ export default function Index() {
     }
   };
 
+  const uploadGovtId = async () => {
+    if (!imageGovtId) {
+      Alert.alert("Error", "Please select an image first.");
+      setLoading(false);
+      return;
+    }
+
+    if (!auth.currentUser) {
+      Alert.alert("Error", "You must be logged in to upload an image.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(imageGovtId);
+      const blob = await response.blob();
+
+      const storageRef = ref(
+        storage,
+        `gs://inspire-wallet.firebasestorage.app/governmentid/${
+          auth.currentUser.uid
+        }_${new Date()}.jpg`
+      );
+      console.log(storageRef);
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      console.log("Image uploaded successfully:", downloadURL);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      if (error.serverResponse) {
+        console.error("Server response:", error.serverResponse);
+      }
+      Alert.alert("Error", "Failed to upload image. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (userAmount > 0) {
-      setAmount(500);
+      setAmount(625);
     } else {
-      setAmount(1000);
+      setAmount(1250);
     }
   }, [userAmount]);
 
@@ -260,6 +320,7 @@ export default function Index() {
       setTransactionId(transactionId);
       setIsCaptureSuccessful(true);
       uploadImage();
+      uploadGovtId();
     } catch (error) {
       Alert.alert("Error", "Failed to capture payment");
       console.log("Capture error:", error);
@@ -751,6 +812,19 @@ export default function Index() {
               ) : (
                 // Default text when no image is selected
                 <Text style={styles.uploadText}>Upload Passport</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.uploadButton}
+              onPress={selectGovtImage}
+            >
+              {imageGovtId ? (
+                // Display the selected image
+                <Image source={{ uri: imageGovtId }} style={styles.image} />
+              ) : (
+                // Default text when no image is selected
+                <Text style={styles.uploadText}>Upload Government ID</Text>
               )}
             </TouchableOpacity>
 
