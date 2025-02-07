@@ -1,0 +1,86 @@
+{
+  "expo": {
+    "name": "Inspire Wallet",
+    "slug": "investor-wallet",
+    "version": "1.6.9",
+    "orientation": "portrait",
+    "icon": "./assets/images/applogo.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.inspire.inspirewallet",
+      "buildNumber": "35",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification"
+        ],
+        "FirebaseAppDelegateProxyEnabled": false,
+        "UIBackgroundFetchIntervalMinimum": 15,
+        "NSLocationWhenInUseUsageDescription": "We need access to your location to provide personalized services.",
+        "NSCameraUsageDescription": "We need access to your camera to enable photo features.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload and share photos."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/applogo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.inspire.inspirewallet",
+      "versionCode": "29",
+      "permissions": [
+        "INTERNET",
+        "NOTIFICATIONS",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/applogo.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "35.0.0",
+            "enableJetifier": true,
+            "extraProguardRules": "-dontwarn android.support.**\n-dontwarn androidx.**"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "81d5c41e-b862-48d6-a14d-21246b09c564"
+      }
+    },
+    "owner": "amurobrian18",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/81d5c41e-b862-48d6-a14d-21246b09c564"
+    },
+    "newArchEnabled": true
+  }
+}
