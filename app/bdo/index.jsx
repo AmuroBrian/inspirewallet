@@ -33,6 +33,7 @@ export default function Index() {
   const [open, setOpen] = useState(false);
   const [openGender, setOpenGender] = useState(false);
   const [openCivilStatus, setOpenCivilStatus] = useState(false);
+  const [openBank, setOpenBank] = useState(false);
   const [type, setType] = useState(null);
   const [loading, setLoading] = useState(false); // Loading state
   const [date, setDate] = useState(new Date());
@@ -49,7 +50,7 @@ export default function Index() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "BDO",
+      headerTitle: "Finance*",
     });
   }, []);
 
@@ -87,6 +88,7 @@ export default function Index() {
   const [grossIncome, setGrossIncome] = useState(0);
   const [gender, setGender] = useState();
   const [civilStatus, setCivilStatus] = useState("Single");
+  const [BankType,setBankType] = useState("BDO");
   const [citizenShip, setCitizenShip] = useState("Japanese");
 
   const onSubmit = async () => {
@@ -169,6 +171,42 @@ export default function Index() {
             </Text>
 
             {/* TextInput Fields */}
+
+            <DropDownPicker
+              open={openBank}
+              value={BankType}
+              items={[
+                { label: "BDO", value: "BDO" },
+                { label: "Security Bank", value: "Security Bank" },
+                { label: "CTBC", value: "CTBC" },
+                { label: "Unionbank", value: "Unionbank" },
+              ]}
+              setOpen={setOpenBank}
+              setValue={setBankType}
+              placeholder="Select Bank Type"
+              containerStyle={{
+                height: 50,
+                width: "95%",
+                margin: 10,
+                zIndex: 1000,
+              }}
+              style={{
+                backgroundColor: "white",
+                borderColor: "black",
+                borderWidth: 2,
+                borderRadius: 15,
+                zIndex: 1500,
+              }}
+              onPress={() => {
+                setShow(false);
+              }}
+            />
+
+
+
+
+
+
             <TextInput
               style={styles.input}
               placeholder="Enter Email Address"
