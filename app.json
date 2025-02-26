@@ -63,7 +63,8 @@
             "extraProguardRules": "-dontwarn android.support.**\n-dontwarn androidx.**"
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

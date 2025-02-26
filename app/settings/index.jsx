@@ -66,7 +66,7 @@ export default function Index() {
     },
     {
       id: "6",
-      title: "Finance*",
+      title: "Banking Service",
       iconSource: require("../../assets/images/finance.png"),
       routeData: () => {
         router.push("bdo");

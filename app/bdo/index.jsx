@@ -50,7 +50,7 @@ export default function Index() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "Finance*",
+      headerTitle: "Bank Services",
     });
   }, []);
 
@@ -88,7 +88,7 @@ export default function Index() {
   const [grossIncome, setGrossIncome] = useState(0);
   const [gender, setGender] = useState();
   const [civilStatus, setCivilStatus] = useState("Single");
-  const [BankType,setBankType] = useState("BDO");
+  const [BankType, setBankType] = useState("");
   const [citizenShip, setCitizenShip] = useState("Japanese");
 
   const onSubmit = async () => {
@@ -117,7 +117,7 @@ export default function Index() {
         process.env.EXPO_PUBLIC_TEMPLATE_ID,
         {
           emailAddress,
-          message: `Name: ${userData.firstName} ${userData.lastName}\nEmail Address: ${emailAddress}\nLandline Number: ${landlineNumber}\nGender: ${gender}\nBirthdate: ${date}\nAddress: ${address}\nSource of Fund: ${sourceFund}\nGross Monthly Income: ${grossIncome}\nCivil Status: ${civilStatus}\nCitizenship: ${citizenShip}\nType: BDO Account Opening`,
+          message: `Name: ${userData.firstName} ${userData.lastName}\nEmail Address: ${emailAddress}\nLandline Number: ${landlineNumber}\nGender: ${gender}\nBirthdate: ${date}\nAddress: ${address}\nBankType: ${BankType}\nSource of Fund: ${sourceFund}\nGross Monthly Income: ${grossIncome}\nCivil Status: ${civilStatus}\nCitizenship: ${citizenShip}\nType: Bank Account Services`,
         },
         {
           publicKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -167,7 +167,7 @@ export default function Index() {
           >
             <Text style={{ padding: 10 }}>
               Please fill up the following form in order to request an open
-              account in BDO.
+              account in our bank services.
             </Text>
 
             {/* TextInput Fields */}
@@ -201,11 +201,6 @@ export default function Index() {
                 setShow(false);
               }}
             />
-
-
-
-
-
 
             <TextInput
               style={styles.input}
