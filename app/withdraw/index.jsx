@@ -159,9 +159,9 @@ export default function Index() {
                 open={open}
                 value={type}
                 items={[
-                  { label: "Time Deposit", value: "Time Deposit" },
+                  { label: "Available Balance Withdrawal", value: "Available Balance Withdrawal" },
                   { label: "Agent Withdrawal", value: "Agent Withdrawal" },
-                  { label: "Stock Withdraw", value: "Stock Withdrawal" },
+                  //{ label: "Stock Withdraw", value: "Stock Withdrawal" },
                 ]}
                 setOpen={setOpen}
                 setValue={setType}
