@@ -50,7 +50,7 @@ export default function Index() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "Finance*",
+      headerTitle: "Finance",
     });
   }, []);
 
