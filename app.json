@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.inspire.inspirewallet",
-      "buildNumber": "37",
+      "buildNumber": "38",
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification"
