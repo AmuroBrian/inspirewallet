@@ -10,9 +10,11 @@ import {
 import { useRouter } from "expo-router";
 
 const images = [
-  { src: require("../assets/images/xmasads.png"), route: null },
+  { src: require("../assets/images/womensmonth.png"), route: null },
   { src: require("../assets/images/mayaads.png"), route: "/maya" },
-  { src: require("../assets/images/bdoads.png"), route: "/bdo" },
+  { src: require("../assets/images/securitybank.png"), route: "/bdo" },
+  { src: require("../assets/images/unionbank.png"), route: "/bdo" },
+  { src: require("../assets/images/ctbc.png"), route: "/bdo" },
 ];
 
 const AutoCarousel = () => {
@@ -80,7 +82,7 @@ const AutoCarousel = () => {
 
 const styles = StyleSheet.create({
   carouselContainer: {
-    width: "100%",
+    width: Dimensions.get("window").width,
     height: 120,
     overflow: "hidden",
     justifyContent: "center",
@@ -90,12 +92,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     padding: 0,
+    gap: 3,
   },
   carouselImage: {
     width: Dimensions.get("window").width - 30,
     height: 150,
     resizeMode: "contain",
-    margin: 0,
   },
 });
 
