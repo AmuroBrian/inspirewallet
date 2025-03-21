@@ -170,7 +170,7 @@ export default function Index() {
                     elevation: 5,
                   }}
                   onPress={() => {
-                    router.push("settings");
+                    router.replace("settings");
                   }}
                 >
                   <Text

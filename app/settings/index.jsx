@@ -29,7 +29,7 @@ export default function Index() {
       title: "Investment Profile",
       iconSource: require("../../assets/images/investmentprofile.png"),
       routeData: () => {
-        router.push("investmentprofile");
+        router.replace("investmentprofile");
       },
     },
     {
@@ -37,7 +37,7 @@ export default function Index() {
       title: "Agent",
       iconSource: require("../../assets/images/agentdashboard.png"),
       routeData: () => {
-        router.push("agentdashboard");
+        router.replace("agentdashboard");
       },
     },
     {
@@ -45,7 +45,7 @@ export default function Index() {
       title: "Stockholder",
       iconSource: require("../../assets/images/stock.png"),
       routeData: () => {
-        router.push("stockholder");
+        router.replace("stockholder");
       },
     },
     {
@@ -53,7 +53,7 @@ export default function Index() {
       title: "Inspire Cards",
       iconSource: require("../../assets/images/card.png"),
       routeData: () => {
-        router.push("inspirecards");
+        router.replace("inspirecards");
       },
     },
     {
@@ -61,7 +61,7 @@ export default function Index() {
       title: "Maya",
       iconSource: require("../../assets/images/maya.png"),
       routeData: () => {
-        router.push("maya");
+        router.replace("maya");
       },
     },
     {
@@ -69,7 +69,7 @@ export default function Index() {
       title: "Banking Service",
       iconSource: require("../../assets/images/finance.png"),
       routeData: () => {
-        router.push("bdo");
+        router.replace("bdo");
       },
     },
     // {
@@ -95,7 +95,7 @@ export default function Index() {
       title: "Events",
       iconSource: require("../../assets/images/event.png"),
       routeData: () => {
-        router.push("events");
+        router.replace("events");
       },
     },
     {
@@ -103,7 +103,7 @@ export default function Index() {
       title: "Travel Protection",
       iconSource: require("../../assets/images/travel.png"),
       routeData: () => {
-        router.push("travel");
+        router.replace("travel");
       },
     },
     {
@@ -111,31 +111,39 @@ export default function Index() {
       title: "Privacy Policy",
       iconSource: require("../../assets/images/privacypolicy.png"),
       routeData: () => {
-        router.push("privacy");
+        router.replace("privacy");
       },
     },
     {
       id: "11",
-      title: "Terms & Conditions",
-      iconSource: require("../../assets/images/termsandcondition.png"),
+      title: "Passcode",
+      iconSource: require("../../assets/images/passcode.png"),
       routeData: () => {
-        router.push("termsandcondition");
+        router.replace("passcode");
       },
     },
     {
       id: "12",
-      title: "About Us",
-      iconSource: require("../../assets/images/aboutus.png"),
+      title: "Terms & Conditions",
+      iconSource: require("../../assets/images/termsandcondition.png"),
       routeData: () => {
-        router.push("about");
+        router.replace("termsandcondition");
       },
     },
     {
       id: "13",
+      title: "About Us",
+      iconSource: require("../../assets/images/aboutus.png"),
+      routeData: () => {
+        router.replace("about");
+      },
+    },
+    {
+      id: "14",
       title: "Help Center",
       iconSource: require("../../assets/images/helpcenter.png"),
       routeData: () => {
-        router.push("helpcenter");
+        router.replace("helpcenter");
       },
     },
   ];
