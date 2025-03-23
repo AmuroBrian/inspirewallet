@@ -23,6 +23,8 @@ import { auth, firestore } from "../../configs/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, doc, setDoc, addDoc } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "./../../components/LoadingScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
@@ -89,6 +91,10 @@ export default function Index() {
       const user = userCredential.user;
       let now = new Date();
 
+      await AsyncStorage.clear();
+      await AsyncStorage.setItem("userEmail", emailAddress);
+      await AsyncStorage.setItem("userPassword", password);
+
       await setDoc(doc(firestore, "users", user.uid), {
         firstName,
         lastName,
@@ -98,6 +104,16 @@ export default function Index() {
         agentWalletAmount: 0,
         usdtAmount: 0,
         availBalanceAmount: 0,
+        emailAddress: emailAddress,
+        dollarDepositAmount: 0,
+        dollarAvailBalanceAmount: 0,
+        cryptoAvailBalanceAmount: 0,
+        dollarWalletAmount: 0,
+        cryptoWalletAmount: 0,
+        createdAt: now,
+        agent: false,
+        lastSignedIn: now,
+        stock: false,
       });
 
       await addDoc(collection(firestore, "users", user.uid, "transactions"), {
@@ -159,6 +175,10 @@ export default function Index() {
     }
   };
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground
@@ -170,85 +190,78 @@ export default function Index() {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <SafeAreaView style={styles.androidSafeArea} />
-          {loading ? (
-            <ActivityIndicator
-              size="large"
-              color={Colors.newYearTheme.background}
+          <ScrollView
+            contentContainerStyle={styles.formContainer}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.headerText}>REGISTER</Text>
+            <View style={{ width: "100%", height: 30 }}></View>
+            <Text style={styles.subHeaderText}>WELCOME INVESTOR!</Text>
+            <View style={{ width: "100%", height: 30 }}></View>
+            <Text style={styles.infoText}>
+              Register to Inspire in order for you to track your Investment!
+            </Text>
+            <View style={{ width: "100%", height: 30 }}></View>
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              placeholderTextColor="black"
+              onChangeText={(value) => setFirstName(value)}
             />
-          ) : (
-            <ScrollView
-              contentContainerStyle={styles.formContainer}
-              keyboardShouldPersistTaps="handled"
-            >
-              <Text style={styles.headerText}>REGISTER</Text>
-              <View style={{ width: "100%", height: 30 }}></View>
-              <Text style={styles.subHeaderText}>WELCOME INVESTOR!</Text>
-              <View style={{ width: "100%", height: 30 }}></View>
-              <Text style={styles.infoText}>
-                Register to Inspire in order for you to track your Investment!
-              </Text>
-              <View style={{ width: "100%", height: 30 }}></View>
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              placeholderTextColor="black"
+              onChangeText={(value) => setLastName(value)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email Address"
+              placeholderTextColor="black"
+              keyboardType="email-address"
+              onChangeText={(value) => setEmailAddress(value)}
+            />
+            <View style={styles.passwordContainer}>
               <TextInput
-                style={styles.input}
-                placeholder="First Name"
+                style={styles.passwordInput}
+                placeholder="Password"
                 placeholderTextColor="black"
-                onChangeText={(value) => setFirstName(value)}
+                secureTextEntry={!showPassword}
+                onChangeText={(value) => setPassword(value)}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Last Name"
-                placeholderTextColor="black"
-                onChangeText={(value) => setLastName(value)}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Email Address"
-                placeholderTextColor="black"
-                keyboardType="email-address"
-                onChangeText={(value) => setEmailAddress(value)}
-              />
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={styles.passwordInput}
-                  placeholder="Password"
-                  placeholderTextColor="black"
-                  secureTextEntry={!showPassword}
-                  onChangeText={(value) => setPassword(value)}
-                />
-                <TouchableOpacity
-                  style={styles.eyeButton}
-                  onPress={() => setShowPassword(!showPassword)}
-                >
-                  <Text style={styles.eyeButtonText}>
-                    {showPassword ? "Hide" : "Show"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={styles.passwordInput}
-                  placeholder="Confirm Password"
-                  placeholderTextColor="black"
-                  secureTextEntry={!showConfirmPass}
-                  onChangeText={(value) => setConfirmPass(value)}
-                />
-                <TouchableOpacity
-                  style={styles.eyeButton}
-                  onPress={() => setShowConfirmPass(!showConfirmPass)}
-                >
-                  <Text style={styles.eyeButtonText}>
-                    {showConfirmPass ? "Hide" : "Show"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
               <TouchableOpacity
-                style={styles.submitButton}
-                onPress={ConfirmPassMethod}
+                style={styles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
               >
-                <Text style={styles.submitButtonText}>REGISTER</Text>
+                <Text style={styles.eyeButtonText}>
+                  {showPassword ? "Hide" : "Show"}
+                </Text>
               </TouchableOpacity>
-            </ScrollView>
-          )}
+            </View>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Confirm Password"
+                placeholderTextColor="black"
+                secureTextEntry={!showConfirmPass}
+                onChangeText={(value) => setConfirmPass(value)}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowConfirmPass(!showConfirmPass)}
+              >
+                <Text style={styles.eyeButtonText}>
+                  {showConfirmPass ? "Hide" : "Show"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={ConfirmPassMethod}
+            >
+              <Text style={styles.submitButtonText}>REGISTER</Text>
+            </TouchableOpacity>
+          </ScrollView>
           <SafeAreaView style={styles.androidSafeArea} />
         </KeyboardAvoidingView>
       </ImageBackground>

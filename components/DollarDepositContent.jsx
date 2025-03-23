@@ -1,11 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-export default function AvailBalanceContent({
-  availBalanceAmount,
-  dollarAvailBalanceAmount,
-  cryptoAvailBalanceAmount,
-}) {
+export default function AvailBalanceContent({ dollarDepositAmount }) {
   const formatCurrency = (value) => {
     const numberValue = Number(value);
     if (isNaN(numberValue)) {
@@ -13,7 +9,7 @@ export default function AvailBalanceContent({
     }
     const numStr = numberValue.toString().replace(/,/g, "");
     const formattedStr = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return formattedStr;
+    return `USD ${formattedStr}`;
   };
   return (
     <View style={styles.container}>
@@ -24,7 +20,7 @@ export default function AvailBalanceContent({
           paddingLeft: 10,
         }}
       >
-        Available Balance
+        Dollar Deposit
       </Text>
       <Text
         style={{
@@ -34,27 +30,7 @@ export default function AvailBalanceContent({
           fontSize: 20,
         }}
       >
-        PHP {formatCurrency(availBalanceAmount)}
-      </Text>
-      <Text
-        style={{
-          width: "100%",
-          textAlign: "right",
-          paddingRight: 10,
-          fontSize: 20,
-        }}
-      >
-        USD {formatCurrency(dollarAvailBalanceAmount)}
-      </Text>
-      <Text
-        style={{
-          width: "100%",
-          textAlign: "right",
-          paddingRight: 10,
-          fontSize: 20,
-        }}
-      >
-        USDT {formatCurrency(cryptoAvailBalanceAmount)}
+        {formatCurrency(dollarDepositAmount)}
       </Text>
     </View>
   );
@@ -63,7 +39,7 @@ export default function AvailBalanceContent({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: "auto",
+    height: 70,
     backgroundColor: "white",
     borderColor: "black",
     borderWidth: 2,
@@ -71,6 +47,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     margin: 5,
-    padding: 10,
   },
 });

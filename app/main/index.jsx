@@ -17,13 +17,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
 import { auth, firestore } from "../../configs/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
-import AmountContent from "../../components/AmountContent";
+import TimeDepositContent from "../../components/TimeDepositContent";
 import { useRouter } from "expo-router";
-import WithdrawContent from "../../components/WithdrawContent";
 import USDTAmountContent from "../../components/USDTAmountContent";
 import IconButton from "../../components/IconButton";
 import AutoCarousel from "../../components/AutoCarousel";
 import { Colors } from "../../constants/Colors";
+import DollarDepositContent from "../../components/DollarDepositContent";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -170,7 +170,7 @@ export default function Index() {
                     elevation: 5,
                   }}
                   onPress={() => {
-                    router.replace("settings");
+                    router.push("settings");
                   }}
                 >
                   <Text
@@ -185,9 +185,13 @@ export default function Index() {
               </View>
 
               {/* Other Components */}
-              <AmountContent walletAmount={data.timeDepositAmount || 0} />
+              <TimeDepositContent
+                timeDepositAmount={data.timeDepositAmount || 0}
+              />
+              <DollarDepositContent
+                dollarDepositAmount={data.dollarDepositAmount || 0}
+              />
               <USDTAmountContent usdtAmount={data.usdtAmount || 0} />
-              <WithdrawContent withdrawAmount={data.walletAmount || 0} />
             </View>
           }
           ListFooterComponent={

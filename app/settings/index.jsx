@@ -29,7 +29,7 @@ export default function Index() {
       title: "Investment Profile",
       iconSource: require("../../assets/images/investmentprofile.png"),
       routeData: () => {
-        router.replace("investmentprofile");
+        router.push("investmentprofile");
       },
     },
     {
@@ -37,7 +37,7 @@ export default function Index() {
       title: "Agent",
       iconSource: require("../../assets/images/agentdashboard.png"),
       routeData: () => {
-        router.replace("agentdashboard");
+        router.push("agentdashboard");
       },
     },
     {
@@ -45,7 +45,7 @@ export default function Index() {
       title: "Stockholder",
       iconSource: require("../../assets/images/stock.png"),
       routeData: () => {
-        router.replace("stockholder");
+        router.push("stockholder");
       },
     },
     {
@@ -53,7 +53,7 @@ export default function Index() {
       title: "Inspire Cards",
       iconSource: require("../../assets/images/card.png"),
       routeData: () => {
-        router.replace("inspirecards");
+        router.push("inspirecards");
       },
     },
     {
@@ -61,7 +61,7 @@ export default function Index() {
       title: "Maya",
       iconSource: require("../../assets/images/maya.png"),
       routeData: () => {
-        router.replace("maya");
+        router.push("maya");
       },
     },
     {
@@ -69,7 +69,7 @@ export default function Index() {
       title: "Banking Service",
       iconSource: require("../../assets/images/finance.png"),
       routeData: () => {
-        router.replace("bdo");
+        router.push("bdo");
       },
     },
     // {
@@ -95,7 +95,7 @@ export default function Index() {
       title: "Events",
       iconSource: require("../../assets/images/event.png"),
       routeData: () => {
-        router.replace("events");
+        router.push("events");
       },
     },
     {
@@ -103,7 +103,7 @@ export default function Index() {
       title: "Travel Protection",
       iconSource: require("../../assets/images/travel.png"),
       routeData: () => {
-        router.replace("travel");
+        router.push("travel");
       },
     },
     {
@@ -111,7 +111,7 @@ export default function Index() {
       title: "Privacy Policy",
       iconSource: require("../../assets/images/privacypolicy.png"),
       routeData: () => {
-        router.replace("privacy");
+        router.push("privacy");
       },
     },
     {
@@ -119,7 +119,7 @@ export default function Index() {
       title: "Passcode",
       iconSource: require("../../assets/images/passcode.png"),
       routeData: () => {
-        router.replace("passcode");
+        router.push("passcode");
       },
     },
     {
@@ -127,7 +127,7 @@ export default function Index() {
       title: "Terms & Conditions",
       iconSource: require("../../assets/images/termsandcondition.png"),
       routeData: () => {
-        router.replace("termsandcondition");
+        router.push("termsandcondition");
       },
     },
     {
@@ -135,7 +135,7 @@ export default function Index() {
       title: "About Us",
       iconSource: require("../../assets/images/aboutus.png"),
       routeData: () => {
-        router.replace("about");
+        router.push("about");
       },
     },
     {
@@ -143,7 +143,7 @@ export default function Index() {
       title: "Help Center",
       iconSource: require("../../assets/images/helpcenter.png"),
       routeData: () => {
-        router.replace("helpcenter");
+        router.push("helpcenter");
       },
     },
   ];
@@ -161,8 +161,12 @@ export default function Index() {
       // Sign out from Firebase
       await signOut(auth);
 
+      router.replace("/");
+
       // Navigate to the login screen
-      router.replace("/"); // Adjust the path as needsed
+      setTimeout(() => {
+        router.replace("/"); // Adjust the path as needed
+      }, 100);
     } catch (error) {
       console.error("Error signing out: ", error);
     }
@@ -193,7 +197,7 @@ export default function Index() {
         data={DATA}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={3} // Set the number of columns to 2
+        numColumns={3} // Set the number of columns to 3
       />
 
       <TouchableOpacity
@@ -274,7 +278,7 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1, // Ensure FlatList takes full height
-    width: "95%",
+    width: "100%",
   },
   soonBadge: {
     position: "absolute",

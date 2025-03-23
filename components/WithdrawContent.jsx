@@ -1,7 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-export default function WithdrawContent({ withdrawAmount }) {
+export default function WithdrawContent({
+  withdrawAmount,
+  dollarWithdrawAmount,
+  cryptoWithdrawAmount,
+}) {
   const formatCurrency = (value) => {
     const numberValue = Number(value);
     if (isNaN(numberValue)) {
@@ -9,7 +13,7 @@ export default function WithdrawContent({ withdrawAmount }) {
     }
     const numStr = numberValue.toString().replace(/,/g, "");
     const formattedStr = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return `PHP ${formattedStr}`;
+    return formattedStr;
   };
   return (
     <View style={styles.container}>
@@ -30,7 +34,27 @@ export default function WithdrawContent({ withdrawAmount }) {
           fontSize: 20,
         }}
       >
-        {formatCurrency(withdrawAmount)}
+        PHP {formatCurrency(withdrawAmount)}
+      </Text>
+      <Text
+        style={{
+          width: "100%",
+          textAlign: "right",
+          paddingRight: 10,
+          fontSize: 20,
+        }}
+      >
+        USD {formatCurrency(dollarWithdrawAmount)}
+      </Text>
+      <Text
+        style={{
+          width: "100%",
+          textAlign: "right",
+          paddingRight: 10,
+          fontSize: 20,
+        }}
+      >
+        USDT {formatCurrency(cryptoWithdrawAmount)}
       </Text>
     </View>
   );
@@ -39,7 +63,7 @@ export default function WithdrawContent({ withdrawAmount }) {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: 70,
+    height: "auto",
     backgroundColor: "white",
     borderColor: "black",
     borderWidth: 2,
@@ -47,5 +71,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     margin: 5,
+    padding: 10,
   },
 });

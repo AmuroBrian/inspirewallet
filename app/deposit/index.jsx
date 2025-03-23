@@ -24,6 +24,7 @@ import { getAuth } from "firebase/auth";
 import DropDownPicker from "react-native-dropdown-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function Index() {
   const db = getFirestore();
@@ -116,6 +117,10 @@ export default function Index() {
     }
   };
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground
@@ -173,28 +178,19 @@ export default function Index() {
                 your investment or stock purchase details. Please note that
                 approval for the request will take about 2–3 working days.
               </Text>
-              {isLoading ? (
-                <ActivityIndicator size="large" color="#00a651" />
-              ) : (
-                <>
-                  <TouchableOpacity
-                    style={styles.submitButton}
-                    onPress={onSubmit}
-                  >
-                    <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.submitPaypalButton}
-                    onPress={() =>
-                      Linking.openURL(
-                        "https://www.paypal.com/ncp/payment/8SB8AW72XCHPJ"
-                      )
-                    }
-                  >
-                    <Text style={styles.submitPaypalText}>PAY VIA PAYPAL</Text>
-                  </TouchableOpacity>
-                </>
-              )}
+              <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
+                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.submitPaypalButton}
+                onPress={() =>
+                  Linking.openURL(
+                    "https://www.paypal.com/ncp/payment/8SB8AW72XCHPJ"
+                  )
+                }
+              >
+                <Text style={styles.submitPaypalText}>PAY VIA PAYPAL</Text>
+              </TouchableOpacity>
               <CurrencyConverter />
             </View>
           </KeyboardAwareScrollView>

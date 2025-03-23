@@ -23,12 +23,13 @@ import {
   collection,
 } from "firebase/firestore";
 import InvestmentProfileButtons from "../../components/InvestmentProfileButtons";
-import AmountContent from "../../components/AmountContent";
+import AmountContent from "../../components/TimeDepositContent";
 import AvailBalanceContent from "../../components/AvailBalanceContent";
 import TransactionHistory from "../../components/TransactionHistory";
 import AutoCarousel from "../../components/AutoCarousel";
 import CurrencyConverter from "../../components/CurrencyConverter";
 import { Colors } from "../../constants/Colors";
+import WithdrawContent from "../../components/WithdrawContent";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -70,24 +71,47 @@ export default function Index() {
     >
       <SafeAreaView style={styles.androidSafeArea} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.mainContainer}>
-          <AvailBalanceContent availBalanceAmount={data.availBalanceAmount} />
-          <AutoCarousel />
-          <CurrencyConverter />
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.buttonContainer}
-              onPress={() => router.push("withdraw")}
+        <ScrollView
+          style={{ flex: 1, width: "100%" }}
+          contentContainerStyle={{ alignItems: "center" }}
+        >
+          <View style={styles.mainContainer}>
+            <WithdrawContent
+              withdrawAmount={data.walletAmount || 0}
+              dollarWithdrawAmount={data.dollarWalletAmount || 0}
+              cryptoWithdrawAmount={data.cryptoWalletAmount || 0}
+            />
+            <AvailBalanceContent
+              availBalanceAmount={data.availBalanceAmount || 0}
+              dollarAvailBalanceAmount={data.dollarAvailBalanceAmount || 0}
+              cryptoAvailBalanceAmount={data.cryptoAvailBalanceAmount || 0}
+            />
+            <View
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                overflow: "hidden",
+              }}
             >
-              <Text
-                style={{ color: Colors.newYearTheme.text, fontWeight: "500" }}
+              <AutoCarousel />
+            </View>
+            <CurrencyConverter />
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={styles.buttonContainer}
+                onPress={() => router.push("withdraw")}
               >
-                WITHDRAW
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={{ color: Colors.newYearTheme.text, fontWeight: "500" }}
+                >
+                  WITHDRAW
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <TransactionHistory userId={userId} />
           </View>
-          <TransactionHistory userId={userId} />
-        </View>
+        </ScrollView>
       </TouchableWithoutFeedback>
       <SafeAreaView style={styles.androidSafeArea} />
     </ImageBackground>

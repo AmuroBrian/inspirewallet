@@ -15,15 +15,17 @@ import {
   Alert,
   BackHandler,
   useWindowDimensions,
+  ScrollView,
 } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { onSnapshot, doc, getDoc } from "firebase/firestore";
-import { auth, app, firestore } from "../configs/firebase";
+import { onSnapshot, doc } from "firebase/firestore";
+import { firestore } from "../configs/firebase";
 import { useState, useEffect } from "react";
 import { Modal } from "react-native";
 import { BlurView } from "expo-blur";
 import { Colors } from "../constants/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingScreen from "./../components/LoadingScreen";
 
 export default function Index() {
   const router = useRouter();
@@ -41,6 +43,17 @@ export default function Index() {
     });
   }, []);
 
+  useEffect(() => {
+    // Block back button on Android
+    const backAction = () => true;
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isMaintenance, setIsMaintenance] = useState(false);
@@ -50,9 +63,10 @@ export default function Index() {
   const [checkPasscode, setCheckPasscode] = useState("");
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState("");
+  const [loadingScreen, setLoadingScreen] = useState(false);
 
   useEffect(() => {
-    setIsDeveloper(false);
+    setIsDeveloper(true);
   }, []);
 
   const checkUserPasscode = async () => {
@@ -64,9 +78,6 @@ export default function Index() {
         console.log("No email or password found in AsyncStorage.");
         return;
       }
-
-      console.log("Stored Email:", userEmail);
-      console.log("Stored Password:", userPassword);
 
       // Re-authenticate user
       const userCredential = await signInWithEmailAndPassword(
@@ -139,7 +150,7 @@ export default function Index() {
     return () => unsubscribe();
   }, []);
 
-  if (isMaintenance || isDeveloper) {
+  if (!isMaintenance || !isDeveloper) {
     return (
       <Modal
         transparent={true}
@@ -216,6 +227,7 @@ export default function Index() {
           router.replace("/main");
         } else {
           setError("Incorrect Passcode");
+          Alert.alert("Incorrect Passcode");
         }
       } else {
         setError("Passcode must be 4 digits");
@@ -355,15 +367,20 @@ export default function Index() {
   }
 
   const SignIn = () => {
+    setLoadingScreen(true);
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
         await AsyncStorage.clear();
         await AsyncStorage.setItem("userEmail", email);
         await AsyncStorage.setItem("userPassword", password);
-        router.replace("/main");
+        setTimeout(() => {
+          setLoadingScreen(false);
+          router.replace("/main");
+        }, 2000);
       })
       .catch((error) => {
+        setLoadingScreen(false);
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage);
@@ -382,12 +399,14 @@ export default function Index() {
           errorCode === "auth/missing-email" ||
           errorCode === "auth/invalid-email"
         ) {
+          setLoadingScreen(false);
           if (Platform.OS === "android") {
             ToastAndroid.show("Missing Email or Password", ToastAndroid.SHORT);
           } else if (Platform.OS === "ios") {
             Alert.alert("Invalid", "Missing Email or Password");
           }
         } else if (errorCode === "auth/too-many-requests") {
+          setLoadingScreen(false);
           if (Platform.OS === "android") {
             ToastAndroid.show(
               "It seems you forgot email or password. Please click forgot password.",
@@ -403,6 +422,10 @@ export default function Index() {
         }
       });
   };
+
+  if (loadingScreen) {
+    return <LoadingScreen />;
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -511,17 +534,6 @@ export default function Index() {
                   REGISTER
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push("/forgotpassword")}>
-                <Text
-                  style={{
-                    color: "black",
-                    textDecorationLine: "underline",
-                    marginTop: 10,
-                  }}
-                >
-                  Forgot Password?
-                </Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
                   setIsPasscodeScreen(true);
@@ -535,6 +547,17 @@ export default function Index() {
                   }}
                 >
                   Enter Passcode Instead
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("/forgotpassword")}>
+                <Text
+                  style={{
+                    color: "black",
+                    textDecorationLine: "underline",
+                    marginTop: 10,
+                  }}
+                >
+                  Forgot Password?
                 </Text>
               </TouchableOpacity>
             </View>

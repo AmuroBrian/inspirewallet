@@ -33,6 +33,7 @@ import {
 } from "firebase/storage";
 import { storage, auth } from "../../configs/firebase";
 import axios from "axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -433,6 +434,10 @@ export default function Index() {
     createOrder();
   };
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <ImageBackground
       source={require("../../assets/images/bg2.png")}
@@ -832,17 +837,13 @@ export default function Index() {
               5–7 working days.
             </Text>
 
-            {loading ? (
-              <ActivityIndicator size="large" color="#00a651" />
-            ) : (
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={onSubmit}
-                disabled={loading}
-              >
-                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={onSubmit}
+              disabled={loading}
+            >
+              <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
+            </TouchableOpacity>
             <View style={{ width: "100%", height: 300 }} />
           </ScrollView>
         </TouchableWithoutFeedback>
