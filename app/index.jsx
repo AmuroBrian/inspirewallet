@@ -66,7 +66,7 @@ export default function Index() {
   const [loadingScreen, setLoadingScreen] = useState(false);
 
   useEffect(() => {
-    setIsDeveloper(true);
+    setIsDeveloper(false);
   }, []);
 
   const checkUserPasscode = async () => {
