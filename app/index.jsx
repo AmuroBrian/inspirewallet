@@ -66,7 +66,7 @@ export default function Index() {
   const [loadingScreen, setLoadingScreen] = useState(false);
 
   useEffect(() => {
-    setIsDeveloper(false);
+    setIsDeveloper(true);
   }, []);
 
   const checkUserPasscode = async () => {
@@ -150,13 +150,9 @@ export default function Index() {
     return () => unsubscribe();
   }, []);
 
-  if (!isMaintenance || !isDeveloper) {
+  if (isMaintenance && isDeveloper) {
     return (
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={isMaintenance || isDeveloper}
-      >
+      <Modal transparent={true} animationType="fade" visible={true}>
         <ImageBackground
           source={require("../assets/images/bg2.png")}
           style={style.container}
