@@ -14,7 +14,6 @@ import {
   Platform,
   ToastAndroid,
   Linking,
-  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "expo-router";
 import CurrencyConverter from "../../components/CurrencyConverter";
@@ -35,6 +34,8 @@ export default function Index() {
   const [email, setEmail] = useState("");
   const [type, setType] = useState(null);
   const [open, setOpen] = useState(false);
+  const [contractOpen, setContractOpen] = useState(false);
+  const [contractType, setContractType] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // Loading state
 
   useEffect(() => {
@@ -72,7 +73,12 @@ export default function Index() {
   }, []);
 
   const onSubmit = async () => {
-    if (!amount || !email || !type) {
+    if (
+      !amount ||
+      !email ||
+      !type ||
+      (type === "Time Deposit" && !contractType)
+    ) {
       if (Platform.OS === "ios") {
         Alert.alert("Error", "Please fill in all fields before submitting.", [
           "OK",
@@ -83,7 +89,7 @@ export default function Index() {
       return;
     }
 
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     try {
       await send(
@@ -91,7 +97,11 @@ export default function Index() {
         process.env.EXPO_PUBLIC_TEMPLATE_ID,
         {
           email,
-          message: `Name: ${userData.firstName} ${userData.lastName}\nAmount: ${amount}\nEmail Address: ${email}\nType: ${type}`,
+          message: `Name: ${userData.firstName} ${
+            userData.lastName
+          }\nAmount: ${amount}\nEmail Address: ${email}\nType: ${type}${
+            type === "Time Deposit" ? `\nContract Type: ${contractType}` : ""
+          }`,
         },
         {
           publicKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -113,7 +123,7 @@ export default function Index() {
         );
       }
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -155,7 +165,31 @@ export default function Index() {
                   borderWidth: 2,
                   borderRadius: 15,
                 }}
+                zIndex={3000}
               />
+
+              {type === "Time Deposit" && (
+                <DropDownPicker
+                  open={contractOpen}
+                  value={contractType}
+                  items={[
+                    { label: "6 months contract", value: "6_months" },
+                    { label: "1 year contract", value: "1_year" },
+                    { label: "2 years contract", value: "2_years" },
+                  ]}
+                  setOpen={setContractOpen}
+                  setValue={setContractType}
+                  placeholder="Contract Type"
+                  containerStyle={{ height: 50, width: "95%", margin: 10 }}
+                  style={{
+                    backgroundColor: "white",
+                    borderColor: "black",
+                    borderWidth: 2,
+                    borderRadius: 15,
+                  }}
+                  zIndex={2000}
+                />
+              )}
 
               <TextInput
                 style={styles.input}
