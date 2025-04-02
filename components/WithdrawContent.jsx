@@ -11,10 +11,11 @@ export default function WithdrawContent({
     if (isNaN(numberValue)) {
       return "loading data...";
     }
-    const numStr = numberValue.toString().replace(/,/g, "");
-    const formattedStr = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return formattedStr;
+  
+    // Format number with commas and exactly two decimal places
+    return numberValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
+  
   return (
     <View style={styles.container}>
       <Text
