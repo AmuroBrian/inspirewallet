@@ -24,6 +24,7 @@ import { getAuth } from "firebase/auth";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -50,7 +51,11 @@ export default function Index() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
+<<<<<<< HEAD
       headerTitle: "Finance",
+=======
+      headerTitle: "Bank Services",
+>>>>>>> 93992a6fd54af103273be7433629867106c04bd6
     });
   }, []);
 
@@ -88,7 +93,7 @@ export default function Index() {
   const [grossIncome, setGrossIncome] = useState(0);
   const [gender, setGender] = useState();
   const [civilStatus, setCivilStatus] = useState("Single");
-  const [BankType,setBankType] = useState("BDO");
+  const [BankType, setBankType] = useState("");
   const [citizenShip, setCitizenShip] = useState("Japanese");
 
   const onSubmit = async () => {
@@ -117,7 +122,7 @@ export default function Index() {
         process.env.EXPO_PUBLIC_TEMPLATE_ID,
         {
           emailAddress,
-          message: `Name: ${userData.firstName} ${userData.lastName}\nEmail Address: ${emailAddress}\nLandline Number: ${landlineNumber}\nGender: ${gender}\nBirthdate: ${date}\nAddress: ${address}\nSource of Fund: ${sourceFund}\nGross Monthly Income: ${grossIncome}\nCivil Status: ${civilStatus}\nCitizenship: ${citizenShip}\nType: BDO Account Opening`,
+          message: `Name: ${userData.firstName} ${userData.lastName}\nEmail Address: ${emailAddress}\nLandline Number: ${landlineNumber}\nGender: ${gender}\nBirthdate: ${date}\nAddress: ${address}\nBankType: ${BankType}\nSource of Fund: ${sourceFund}\nGross Monthly Income: ${grossIncome}\nCivil Status: ${civilStatus}\nCitizenship: ${citizenShip}\nType: Bank Account Services`,
         },
         {
           publicKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -149,6 +154,10 @@ export default function Index() {
     }
   };
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <ImageBackground
       source={require("../../assets/images/bg2.png")}
@@ -167,7 +176,7 @@ export default function Index() {
           >
             <Text style={{ padding: 10 }}>
               Please fill up the following form in order to request an open
-              account in BDO.
+              account in our bank services.
             </Text>
 
             {/* TextInput Fields */}
@@ -201,11 +210,6 @@ export default function Index() {
                 setShow(false);
               }}
             />
-
-
-
-
-
 
             <TextInput
               style={styles.input}
@@ -371,17 +375,13 @@ export default function Index() {
               5–7 working days.
             </Text>
 
-            {loading ? (
-              <ActivityIndicator size="large" color="#00a651" />
-            ) : (
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={onSubmit}
-                disabled={loading}
-              >
-                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={onSubmit}
+              disabled={loading}
+            >
+              <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
+            </TouchableOpacity>
             <View style={{ width: "100%", height: 300 }} />
           </ScrollView>
         </TouchableWithoutFeedback>

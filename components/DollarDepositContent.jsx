@@ -1,21 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-export default function WithdrawContent({
-  withdrawAmount,
-  dollarWithdrawAmount,
-  cryptoWithdrawAmount,
-}) {
+export default function AvailBalanceContent({ dollarDepositAmount }) {
   const formatCurrency = (value) => {
     const numberValue = Number(value);
     if (isNaN(numberValue)) {
       return "loading data...";
     }
-  
-    // Format number with commas and exactly two decimal places
-    return numberValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    const numStr = numberValue.toString().replace(/,/g, "");
+    const formattedStr = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `USD ${formattedStr}`;
   };
-  
   return (
     <View style={styles.container}>
       <Text
@@ -25,7 +20,7 @@ export default function WithdrawContent({
           paddingLeft: 10,
         }}
       >
-        Amount Wallet
+        Dollar Deposit
       </Text>
       <Text
         style={{
@@ -35,27 +30,7 @@ export default function WithdrawContent({
           fontSize: 20,
         }}
       >
-        PHP {formatCurrency(withdrawAmount)}
-      </Text>
-      <Text
-        style={{
-          width: "100%",
-          textAlign: "right",
-          paddingRight: 10,
-          fontSize: 20,
-        }}
-      >
-        USD {formatCurrency(dollarWithdrawAmount)}
-      </Text>
-      <Text
-        style={{
-          width: "100%",
-          textAlign: "right",
-          paddingRight: 10,
-          fontSize: 20,
-        }}
-      >
-        USDT {formatCurrency(cryptoWithdrawAmount)}
+        {formatCurrency(dollarDepositAmount)}
       </Text>
     </View>
   );
@@ -64,7 +39,7 @@ export default function WithdrawContent({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: "auto",
+    height: 70,
     backgroundColor: "white",
     borderColor: "black",
     borderWidth: 2,
@@ -72,6 +47,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     margin: 5,
-    padding: 10,
   },
 });

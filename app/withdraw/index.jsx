@@ -13,7 +13,6 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -22,6 +21,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -131,6 +131,10 @@ export default function Index() {
     }
   };
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <ImageBackground
       source={require("../../assets/images/bg2.png")}
@@ -159,9 +163,14 @@ export default function Index() {
                 open={open}
                 value={type}
                 items={[
+<<<<<<< HEAD
                   { label: "Available Balance Withdrawal", value: "Available Balance Withdrawal" },
                   { label: "Agent Withdrawal", value: "Agent Withdrawal" },
                   //{ label: "Stock Withdraw", value: "Stock Withdrawal" },
+=======
+                  { label: "Available Balance", value: "Available Balance" },
+                  { label: "Agent Withdrawal", value: "Agent Withdrawal" },
+>>>>>>> 93992a6fd54af103273be7433629867106c04bd6
                 ]}
                 setOpen={setOpen}
                 setValue={setType}
@@ -221,18 +230,13 @@ export default function Index() {
                 bank account details. Please note that this process will take
                 about 5–7 working days.
               </Text>
-
-              {loading ? (
-                <ActivityIndicator size="large" color="#00a651" />
-              ) : (
-                <TouchableOpacity
-                  style={styles.submitButton}
-                  onPress={onSubmit}
-                  disabled={loading}
-                >
-                  <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={onSubmit}
+                disabled={loading}
+              >
+                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
+              </TouchableOpacity>
               <View style={{ width: "100%", height: 300 }} />
             </ScrollView>
           </TouchableWithoutFeedback>

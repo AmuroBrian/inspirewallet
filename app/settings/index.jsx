@@ -66,7 +66,11 @@ export default function Index() {
     },
     {
       id: "6",
+<<<<<<< HEAD
       title: "Finance",
+=======
+      title: "Banking Service",
+>>>>>>> 93992a6fd54af103273be7433629867106c04bd6
       iconSource: require("../../assets/images/finance.png"),
       routeData: () => {
         router.push("bdo");
@@ -116,6 +120,14 @@ export default function Index() {
     },
     {
       id: "11",
+      title: "Passcode",
+      iconSource: require("../../assets/images/passcode.png"),
+      routeData: () => {
+        router.push("passcode");
+      },
+    },
+    {
+      id: "12",
       title: "Terms & Conditions",
       iconSource: require("../../assets/images/termsandcondition.png"),
       routeData: () => {
@@ -123,7 +135,7 @@ export default function Index() {
       },
     },
     {
-      id: "12",
+      id: "13",
       title: "About Us",
       iconSource: require("../../assets/images/aboutus.png"),
       routeData: () => {
@@ -131,7 +143,7 @@ export default function Index() {
       },
     },
     {
-      id: "13",
+      id: "14",
       title: "Help Center",
       iconSource: require("../../assets/images/helpcenter.png"),
       routeData: () => {
@@ -153,8 +165,12 @@ export default function Index() {
       // Sign out from Firebase
       await signOut(auth);
 
+      router.replace("/");
+
       // Navigate to the login screen
-      router.replace("/"); // Adjust the path as needsed
+      setTimeout(() => {
+        router.replace("/"); // Adjust the path as needed
+      }, 100);
     } catch (error) {
       console.error("Error signing out: ", error);
     }
@@ -185,7 +201,7 @@ export default function Index() {
         data={DATA}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={3} // Set the number of columns to 2
+        numColumns={3} // Set the number of columns to 3
       />
 
       <TouchableOpacity
@@ -266,7 +282,7 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1, // Ensure FlatList takes full height
-    width: "95%",
+    width: "100%",
   },
   soonBadge: {
     position: "absolute",

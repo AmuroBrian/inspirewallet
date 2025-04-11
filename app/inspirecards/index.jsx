@@ -20,6 +20,7 @@ import { useRouter, useNavigation } from "expo-router";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -119,6 +120,10 @@ export default function Index() {
     });
   }, []);
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <ImageBackground
       source={require("../../assets/images/bg2.png")}
@@ -127,80 +132,73 @@ export default function Index() {
       <SafeAreaView style={styles.androidSafeArea} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.mainContainer}>
-          {loading ? ( // Display the loading indicator
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="green" />
-              <Text style={styles.loadingText}>Submitting Request...</Text>
-            </View>
-          ) : (
-            <ScrollView style={{ width: "100%" }}>
-              <Text
-                style={{
-                  padding: 10,
-                  textAlign: "left",
-                  width: "100%",
-                }}
-              >
-                Please fill up the following form.
-              </Text>
+          <ScrollView style={{ width: "100%" }}>
+            <Text
+              style={{
+                padding: 10,
+                textAlign: "left",
+                width: "100%",
+              }}
+            >
+              Please fill up the following form.
+            </Text>
 
-              <TextInput
-                style={styles.textInput}
-                placeholder="Enter Email Address"
-                placeholderTextColor={"black"}
-                keyboardType="email-address"
-                onChangeText={(value) => setEmailAddress(value)}
-              />
-              <TextInput
-                style={styles.reasonInput}
-                placeholder="Enter complete address"
-                placeholderTextColor={"black"}
-                keyboardType="default"
-                multiline
-                textAlignVertical="top"
-                onChangeText={(value) => setAddress(value)}
-              />
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter Email Address"
+              placeholderTextColor={"black"}
+              keyboardType="email-address"
+              onChangeText={(value) => setEmailAddress(value)}
+            />
+            <TextInput
+              style={styles.reasonInput}
+              placeholder="Enter complete address"
+              placeholderTextColor={"black"}
+              keyboardType="default"
+              multiline
+              textAlignVertical="top"
+              onChangeText={(value) => setAddress(value)}
+            />
+            <Text
+              style={{
+                paddingLeft: 10,
+                paddingRight: 10,
+              }}
+            >
+              By submitting these details, we will receive an email confirming
+              your request to concern. We will get back to you as soon as
+              possible. Thank You!
+            </Text>
+            <TouchableOpacity
+              style={{
+                width: "70%",
+                backgroundColor: Colors.newYearTheme.background,
+                padding: 10,
+                borderRadius: 15,
+                margin: 20,
+                alignSelf: "center",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 3,
+                elevation: 5,
+              }}
+              onPress={onSubmit}
+            >
               <Text
                 style={{
-                  paddingLeft: 10,
-                  paddingRight: 10,
+                  textAlign: "center",
+                  width: "100%",
+                  fontSize: 15,
+                  color: Colors.newYearTheme.text,
+                  fontWeight: 600,
                 }}
               >
-                By submitting these details, we will receive an email confirming
-                your request to concern. We will get back to you as soon as
-                possible. Thank You!
+                SUBMIT REQUEST
               </Text>
-              <TouchableOpacity
-                style={{
-                  width: "70%",
-                  backgroundColor: Colors.newYearTheme.background,
-                  padding: 10,
-                  borderRadius: 15,
-                  margin: 20,
-                  alignSelf: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 3,
-                  elevation: 5,
-                }}
-                onPress={onSubmit}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    width: "100%",
-                    fontSize: 15,
-                    color: Colors.newYearTheme.text,
-                    fontWeight: 600,
-                  }}
-                >
-                  SUBMIT REQUEST
-                </Text>
-              </TouchableOpacity>
-              <View style={{ width: "100%", height: 300 }}></View>
-            </ScrollView>
-          )}
+            </TouchableOpacity>
+            <View style={{ width: "100%", height: 300 }}></View>
+          </ScrollView>
         </View>
       </TouchableWithoutFeedback>
       <SafeAreaView style={styles.androidSafeArea} />

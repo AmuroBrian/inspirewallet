@@ -23,7 +23,6 @@ import {
   collection,
 } from "firebase/firestore";
 import InvestmentProfileButtons from "../../components/InvestmentProfileButtons";
-import AmountContent from "../../components/AmountContent";
 
 export default function Index() {
   const navigation = useNavigation();

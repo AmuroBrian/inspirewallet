@@ -24,6 +24,7 @@ import { getAuth } from "firebase/auth";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -146,6 +147,10 @@ export default function Index() {
       setLoading(false); // Stop loading
     }
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <ImageBackground
@@ -333,17 +338,13 @@ export default function Index() {
               5–7 working days.
             </Text>
 
-            {loading ? (
-              <ActivityIndicator size="large" color="#00a651" />
-            ) : (
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={onSubmit}
-                disabled={loading}
-              >
-                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={onSubmit}
+              disabled={loading}
+            >
+              <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
+            </TouchableOpacity>
             <View style={{ width: "100%", height: 300 }} />
           </ScrollView>
         </TouchableWithoutFeedback>

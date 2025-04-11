@@ -14,19 +14,27 @@ import {
   ToastAndroid,
   Alert,
   BackHandler,
+  useWindowDimensions,
+  ScrollView,
 } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { onSnapshot, doc } from "firebase/firestore";
-import { auth, app, firestore } from "../configs/firebase";
+import { firestore } from "../configs/firebase";
 import { useState, useEffect } from "react";
 import { Modal } from "react-native";
 import { BlurView } from "expo-blur";
 import { Colors } from "../constants/Colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoadingScreen from "./../components/LoadingScreen";
 
 export default function Index() {
   const router = useRouter();
   const navigation = useNavigation();
   const auth = getAuth();
+  const { width } = useWindowDimensions();
+  const buttonSize = width * 0.2; // Adjusts button size based on screen width
+  const imageWidth = width * 0.8; // Adjusts image width dynamically
+  const imageHeight = imageWidth * 0.3; // Maintains aspect ratio
 
   useEffect(() => {
     navigation.setOptions({
@@ -35,14 +43,84 @@ export default function Index() {
     });
   }, []);
 
+  useEffect(() => {
+    // Block back button on Android
+    const backAction = () => true;
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
   const [isDeveloper, setIsDeveloper] = useState(false);
+  const [isPasscodeScreen, setIsPasscodeScreen] = useState(false);
+  const [checkPasscode, setCheckPasscode] = useState("");
+  const [passcode, setPasscode] = useState("");
+  const [error, setError] = useState("");
+  const [loadingScreen, setLoadingScreen] = useState(false);
 
   useEffect(() => {
-    setIsDeveloper(false);
+    setIsDeveloper(true);
+  }, []);
+
+  const checkUserPasscode = async () => {
+    try {
+      const userEmail = await AsyncStorage.getItem("userEmail");
+      const userPassword = await AsyncStorage.getItem("userPassword");
+
+      if (!userEmail || !userPassword) {
+        console.log("No email or password found in AsyncStorage.");
+        return;
+      }
+
+      // Re-authenticate user
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        userEmail,
+        userPassword
+      );
+      const user = userCredential.user;
+
+      if (!user) {
+        console.log("Re-authentication failed.");
+        return;
+      }
+
+      const uid = user.uid;
+
+      // 🔥 Real-time listener for user document
+      const userDocRef = doc(firestore, "users", uid);
+      const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+
+          if (userData.passcode) {
+            setCheckPasscode(userData.passcode);
+            setIsPasscodeScreen(true);
+          } else {
+            console.log("No passcode found for this user.");
+          }
+        } else {
+          Alert.alert("Error", "User not found in Firestore.");
+        }
+      });
+
+      // Cleanup listener on unmount
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Error checking passcode:", error);
+    }
+  };
+
+  // Call function inside useEffect to run when the component mounts
+  useEffect(() => {
+    checkUserPasscode();
   }, []);
 
   useEffect(() => {
@@ -72,13 +150,9 @@ export default function Index() {
     return () => unsubscribe();
   }, []);
 
-  if (isMaintenance || isDeveloper) {
+  if (isMaintenance && isDeveloper) {
     return (
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={isMaintenance || isDeveloper}
-      >
+      <Modal transparent={true} animationType="fade" visible={true}>
         <ImageBackground
           source={require("../assets/images/bg2.png")}
           style={style.container}
@@ -139,13 +213,170 @@ export default function Index() {
     );
   }
 
+  const handlePress = (value) => {
+    if (value === "Del") {
+      setPasscode(passcode.slice(0, -1));
+    } else if (value === "✓") {
+      if (passcode.length === 4) {
+        if (passcode === checkPasscode) {
+          Alert.alert("Access Granted!");
+          router.replace("/main");
+        } else {
+          setError("Incorrect Passcode");
+          Alert.alert("Incorrect Passcode");
+        }
+      } else {
+        setError("Passcode must be 4 digits");
+      }
+      setPasscode("");
+    } else {
+      if (passcode.length < 4) {
+        setPasscode(passcode + value);
+        setError("");
+      }
+    }
+  };
+
+  if (isPasscodeScreen) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#f8f9fa",
+          paddingHorizontal: 20,
+        }}
+      >
+        <View
+          style={{
+            width: "100%",
+            height: 200,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={require("../assets/images/title.png")}
+            style={{
+              width: imageWidth,
+              height: imageHeight,
+              resizeMode: "contain",
+            }}
+          />
+        </View>
+
+        <Text
+          style={{
+            fontSize: width * 0.06,
+            fontWeight: "bold",
+            marginBottom: 15,
+            color: "#333",
+          }}
+        >
+          Enter Passcode
+        </Text>
+        <Text
+          style={{
+            fontSize: width * 0.08,
+            marginBottom: 20,
+            fontWeight: "bold",
+            color: "#222",
+          }}
+        >
+          {passcode.replace(/./g, "●")}
+        </Text>
+
+        <View
+          style={{
+            width: "80%",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+          }}
+        >
+          {["1", "2", "3", "4", "5", "6", "7", "8", "9", "Del", "0", "✓"].map(
+            (key, index) => (
+              <TouchableOpacity
+                key={key}
+                style={{
+                  width: "30%", // Ensures 3 columns
+                  aspectRatio: 1, // Makes the buttons square
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginVertical: 5,
+                  backgroundColor: Colors.redTheme.background,
+                  borderRadius: 15,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 5,
+                }}
+                onPress={() => handlePress(key)}
+              >
+                <Text
+                  style={{
+                    fontSize: buttonSize * 0.4,
+                    fontWeight: "bold",
+                    color: "#fff",
+                  }}
+                >
+                  {key}
+                </Text>
+              </TouchableOpacity>
+            )
+          )}
+          {/* New "Use Email and Password" Button */}
+          <TouchableOpacity
+            style={{
+              marginTop: 20,
+              width: "100%",
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              backgroundColor: Colors.redTheme.background,
+              borderRadius: 10,
+            }}
+            onPress={() => {
+              setIsPasscodeScreen(false);
+            }} // Adjust as needed
+          >
+            <Text
+              style={{
+                color: "#fff",
+                fontSize: width * 0.04,
+                fontWeight: "bold",
+                textAlign: "center",
+              }}
+            >
+              Use Email and Password
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {error ? (
+          <Text style={{ color: "red", marginTop: 10, fontSize: width * 0.04 }}>
+            {error}
+          </Text>
+        ) : null}
+      </View>
+    );
+  }
+
   const SignIn = () => {
+    setLoadingScreen(true);
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
-        router.replace("/main");
+        await AsyncStorage.clear();
+        await AsyncStorage.setItem("userEmail", email);
+        await AsyncStorage.setItem("userPassword", password);
+        setTimeout(() => {
+          setLoadingScreen(false);
+          router.replace("/main");
+        }, 2000);
       })
       .catch((error) => {
+        setLoadingScreen(false);
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage);
@@ -164,12 +395,14 @@ export default function Index() {
           errorCode === "auth/missing-email" ||
           errorCode === "auth/invalid-email"
         ) {
+          setLoadingScreen(false);
           if (Platform.OS === "android") {
             ToastAndroid.show("Missing Email or Password", ToastAndroid.SHORT);
           } else if (Platform.OS === "ios") {
             Alert.alert("Invalid", "Missing Email or Password");
           }
         } else if (errorCode === "auth/too-many-requests") {
+          setLoadingScreen(false);
           if (Platform.OS === "android") {
             ToastAndroid.show(
               "It seems you forgot email or password. Please click forgot password.",
@@ -185,6 +418,10 @@ export default function Index() {
         }
       });
   };
+
+  if (loadingScreen) {
+    return <LoadingScreen />;
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -291,6 +528,21 @@ export default function Index() {
                   }}
                 >
                   REGISTER
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setIsPasscodeScreen(true);
+                }}
+              >
+                <Text
+                  style={{
+                    color: "black",
+                    textDecorationLine: "underline",
+                    marginTop: 10,
+                  }}
+                >
+                  Enter Passcode Instead
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => router.push("/forgotpassword")}>

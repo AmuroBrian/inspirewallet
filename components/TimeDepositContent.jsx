@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-export default function AmountContent({ walletAmount }) {
+export default function TimeDepositContent({ timeDepositAmount }) {
   const formatCurrency = (value) => {
     const numberValue = Number(value);
     if (isNaN(numberValue)) {
@@ -30,7 +30,7 @@ export default function AmountContent({ walletAmount }) {
           fontSize: 20,
         }}
       >
-        {formatCurrency(walletAmount)}
+        {formatCurrency(timeDepositAmount)}
       </Text>
     </View>
   );
