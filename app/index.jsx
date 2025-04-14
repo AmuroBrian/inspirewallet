@@ -26,8 +26,16 @@ import { BlurView } from "expo-blur";
 import { Colors } from "../constants/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingScreen from "./../components/LoadingScreen";
+import registerNNPushToken, {
+  registerIndieID,
+  unregisterIndieDevice,
+} from "native-notify";
+import axios from "axios";
 
 export default function Index() {
+  // Wrap the registerNNPushToken call in a try-catch to prevent crashes
+  registerNNPushToken(28259, "QAg2EVLUAIEiCtThmFoSv2");
+
   const router = useRouter();
   const navigation = useNavigation();
   const auth = getAuth();
@@ -157,57 +165,118 @@ export default function Index() {
           source={require("../assets/images/bg2.png")}
           style={style.container}
         >
-          <BlurView
-            intensity={80}
-            tint="dark"
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
-          >
-            <View
+          {Platform.OS === "ios" ? (
+            <BlurView
+              intensity={80}
+              tint="dark"
               style={{
-                backgroundColor: "white",
-                padding: 20,
-                borderRadius: 15,
+                flex: 1,
+                justifyContent: "center",
                 alignItems: "center",
-                width: "80%",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
               }}
             >
-              <Text
-                style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}
-              >
-                Maintenance Mode
-              </Text>
-              <Text
-                style={{ fontSize: 16, textAlign: "center", marginBottom: 20 }}
-              >
-                {maintenanceMessage}
-              </Text>
-              <TouchableOpacity
-                style={style.dismissButton}
-                onPress={() => {
-                  if (Platform.OS === "android") {
-                    BackHandler.exitApp();
-                  } else if (Platform.OS === "ios") {
-                    Alert.alert(
-                      "Exit App",
-                      "The app cannot close itself on iOS. Please close it manually.",
-                      [{ text: "OK" }]
-                    );
-                  }
+              <View
+                style={{
+                  backgroundColor: "white",
+                  padding: 20,
+                  borderRadius: 15,
+                  alignItems: "center",
+                  width: "80%",
                 }}
               >
-                <Text style={style.dismissButtonText}>Dismiss</Text>
-              </TouchableOpacity>
+                <Text
+                  style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}
+                >
+                  Maintenance Mode
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    textAlign: "center",
+                    marginBottom: 20,
+                  }}
+                >
+                  {maintenanceMessage}
+                </Text>
+                <TouchableOpacity
+                  style={style.dismissButton}
+                  onPress={() => {
+                    if (Platform.OS === "android") {
+                      BackHandler.exitApp();
+                    } else if (Platform.OS === "ios") {
+                      Alert.alert(
+                        "Exit App",
+                        "The app cannot close itself on iOS. Please close it manually.",
+                        [{ text: "OK" }]
+                      );
+                    }
+                  }}
+                >
+                  <Text style={style.dismissButtonText}>Dismiss</Text>
+                </TouchableOpacity>
+              </View>
+            </BlurView>
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  padding: 20,
+                  borderRadius: 15,
+                  alignItems: "center",
+                  width: "80%",
+                }}
+              >
+                <Text
+                  style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}
+                >
+                  Maintenance Mode
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    textAlign: "center",
+                    marginBottom: 20,
+                  }}
+                >
+                  {maintenanceMessage}
+                </Text>
+                <TouchableOpacity
+                  style={style.dismissButton}
+                  onPress={() => {
+                    if (Platform.OS === "android") {
+                      BackHandler.exitApp();
+                    } else if (Platform.OS === "ios") {
+                      Alert.alert(
+                        "Exit App",
+                        "The app cannot close itself on iOS. Please close it manually.",
+                        [{ text: "OK" }]
+                      );
+                    }
+                  }}
+                >
+                  <Text style={style.dismissButtonText}>Dismiss</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </BlurView>
+          )}
         </ImageBackground>
       </Modal>
     );
@@ -263,6 +332,9 @@ export default function Index() {
               height: imageHeight,
               resizeMode: "contain",
             }}
+            onError={(error) =>
+              console.error("Error loading passcode screen image:", error)
+            }
           />
         </View>
 
@@ -370,6 +442,7 @@ export default function Index() {
         await AsyncStorage.clear();
         await AsyncStorage.setItem("userEmail", email);
         await AsyncStorage.setItem("userPassword", password);
+        await AsyncStorage.setItem("userid", user.uid);
         setTimeout(() => {
           setLoadingScreen(false);
           router.replace("/main");
@@ -428,6 +501,9 @@ export default function Index() {
       <ImageBackground
         source={require("../assets/images/bg2.png")}
         style={style.container}
+        onError={(error) =>
+          console.error("Error loading background image:", error)
+        }
       >
         <SafeAreaView style={style.androidSafeArea} />
         <View style={style.logoContainer}>
@@ -439,6 +515,9 @@ export default function Index() {
               alignItems: "center",
               justifyContent: "center",
             }}
+            onError={(error) =>
+              console.error("Error loading logo image:", error)
+            }
           />
         </View>
         <Text

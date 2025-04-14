@@ -25,6 +25,8 @@ import { collection, doc, setDoc, addDoc } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
 import LoadingScreen from "./../../components/LoadingScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { registerIndieID, unregisterIndieDevice } from "native-notify";
 
 const { width } = Dimensions.get("window");
 
@@ -48,6 +50,7 @@ export default function Index() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [agentCode, setAgentCode] = useState();
 
   const ConfirmPassMethod = () => {
     if (password === confirmPass) {
@@ -98,6 +101,7 @@ export default function Index() {
       await setDoc(doc(firestore, "users", user.uid), {
         firstName,
         lastName,
+        agentCode: agentCode,
         stockAmount: 0,
         walletAmount: 0,
         timeDepositAmount: 0,
@@ -158,6 +162,19 @@ export default function Index() {
           ["OK"]
         );
       }
+      registerIndieID(user.uid.toString(), 28259, "QAg2EVLUAIEiCtThmFoSv2");
+      await axios.post("https://app.nativenotify.com/api/indie/notification", {
+        subID: `${user.uid}`,
+        appId: 28259,
+        appToken: "QAg2EVLUAIEiCtThmFoSv2",
+        title: "Welcome to Inspire Wallet",
+        message: "Congratulations you successfully registered your account.",
+      });
+      unregisterIndieDevice(
+        user.uid.toString(),
+        28259,
+        "QAg2EVLUAIEiCtThmFoSv2"
+      );
       router.push("/");
     } catch (error) {
       console.log(error);
@@ -213,6 +230,12 @@ export default function Index() {
               placeholder="Last Name"
               placeholderTextColor="black"
               onChangeText={(value) => setLastName(value)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Agent Code"
+              placeholderTextColor="black"
+              onChangeText={(value) => setAgentCode(value)}
             />
             <TextInput
               style={styles.input}
@@ -323,7 +346,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   eyeButtonText: {
-    color: Colors.newYearTheme.background,
+    color: Colors.redTheme.background,
   },
   submitButton: {
     width: width * 0.95,
