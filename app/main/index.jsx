@@ -24,11 +24,20 @@ import IconButton from "../../components/IconButton";
 import AutoCarousel from "../../components/AutoCarousel";
 import { Colors } from "../../constants/Colors";
 import DollarDepositContent from "../../components/DollarDepositContent";
+import axios from "axios";
+import { registerIndieID } from "native-notify";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
   const navigation = useNavigation();
   const router = useRouter();
   const width = Dimensions.get("window").width;
+
+  registerIndieID(
+    auth.currentUser.uid.toString(),
+    28259,
+    "QAg2EVLUAIEiCtThmFoSv2"
+  );
 
   // Sample navigation data
   const DATA = [
@@ -63,6 +72,7 @@ export default function Index() {
   // Fetch user data on component mount
   useEffect(() => {
     const user = auth.currentUser;
+    AsyncStorage.setItem("userid", user.uid);
     if (user) {
       const userRef = doc(firestore, "users", user.uid);
       const unsubscribe = onSnapshot(
@@ -141,7 +151,8 @@ export default function Index() {
                     width: width,
                   }}
                 >
-                  Hi! {data.firstName || "User"} {data.lastName || ""}
+                  Hi! {data.firstName || "User"} {data.lastName || ""}{" "}
+                  {data.agentCode == 0 ? "" : data.agentCode || ""}
                 </Text>
               </View>
 
@@ -170,7 +181,7 @@ export default function Index() {
                     elevation: 5,
                   }}
                   onPress={() => {
-                    router.push("settings");
+                    router.replace("settings");
                   }}
                 >
                   <Text

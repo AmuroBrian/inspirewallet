@@ -11,6 +11,7 @@ import {
   Linking,
   ToastAndroid,
   Alert,
+  Image,
 } from "react-native";
 import React from "react";
 import { useRouter, useNavigation } from "expo-router";
@@ -18,6 +19,9 @@ import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth, firestore } from "../../configs/firebase";
 import IconButton from "../../components/IconButton";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../../constants/Colors";
+import { unregisterIndieDevice } from "native-notify";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -153,6 +157,15 @@ export default function Index() {
       headerShown: true,
       headerTitle: "Settings",
       headerTransparent: true,
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => router.replace("/main")}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 
