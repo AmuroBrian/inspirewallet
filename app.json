@@ -2,7 +2,7 @@
   "expo": {
     "name": "Inspire Wallet",
     "slug": "investor-wallet",
-    "version": "1.8.2",
+    "version": "1.9.0",
     "orientation": "portrait",
     "icon": "./assets/images/applogo.png",
     "scheme": "myapp",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.inspire.inspirewallet",
-      "buildNumber": "42",
+      "buildNumber": "43",
       "infoPlist": {
         "UIBackgroundModes": [
           "remote-notification"
@@ -34,7 +34,8 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.inspire.inspirewallet",
-      "versionCode": 32,
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 33,
       "permissions": [
         "INTERNET",
         "NOTIFICATIONS",
@@ -65,7 +66,14 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/applogo.png",
+          "color": "#ffffff"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

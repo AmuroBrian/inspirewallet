@@ -6,6 +6,8 @@ import {
   View,
   TouchableWithoutFeedback,
   SafeAreaView,
+ 
+  Pressable,
   Platform,
   StatusBar,
   TextInput,
@@ -25,10 +27,12 @@ import { collection, doc, setDoc, addDoc } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
 import LoadingScreen from "./../../components/LoadingScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { registerIndieID, unregisterIndieDevice } from "native-notify";
 
 const { width } = Dimensions.get("window");
 
-export default function Index() {
+export default function Index() {  
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -48,6 +52,22 @@ export default function Index() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [agentCode, setAgentCode] = useState();
+
+  const [isYesChecked, setIsYesChecked] = useState(false);
+  const [isNoChecked, setIsNoChecked] = useState(false);
+
+  const handleYes = () => {
+    setIsYesChecked(true);
+    setIsNoChecked(false);
+  };
+
+  const handleNo = () => {
+    setIsNoChecked(true);
+    setIsYesChecked(false);
+    setAgentCode('');
+  };
+
 
   const ConfirmPassMethod = () => {
     if (password === confirmPass) {
@@ -98,6 +118,7 @@ export default function Index() {
       await setDoc(doc(firestore, "users", user.uid), {
         firstName,
         lastName,
+        agentCode: agentCode,
         stockAmount: 0,
         walletAmount: 0,
         timeDepositAmount: 0,
@@ -158,6 +179,19 @@ export default function Index() {
           ["OK"]
         );
       }
+      registerIndieID(user.uid.toString(), 28259, "QAg2EVLUAIEiCtThmFoSv2");
+      await axios.post("https://app.nativenotify.com/api/indie/notification", {
+        subID: `${user.uid}`,
+        appId: 28259,
+        appToken: "QAg2EVLUAIEiCtThmFoSv2",
+        title: "Welcome to Inspire Wallet",
+        message: "Congratulations you successfully registered your account.",
+      });
+      unregisterIndieDevice(
+        user.uid.toString(),
+        28259,
+        "QAg2EVLUAIEiCtThmFoSv2"
+      );
       router.push("/");
     } catch (error) {
       console.log(error);
@@ -214,6 +248,38 @@ export default function Index() {
               placeholderTextColor="black"
               onChangeText={(value) => setLastName(value)}
             />
+            {/* <TextInput
+              style={styles.input}
+              placeholder="Agent Code"
+              placeholderTextColor="black"
+              onChangeText={(value) => setAgentCode(value)}
+            /> */}
+
+<View style={styles.inlineRow}>
+        <Text style={styles.labelagent}>Agent</Text>
+
+        <Pressable style={styles.checkboxContainer} onPress={handleYes}>
+          <View style={[styles.checkbox, isYesChecked && styles.checkedBox]} />
+          <Text style={styles.checkboxLabel}>Yes</Text>
+        </Pressable>
+
+        <Pressable style={styles.checkboxContainer} onPress={handleNo}>
+          <View style={[styles.checkbox, isNoChecked && styles.checkedBox]} />
+          <Text style={styles.checkboxLabel}>No</Text>
+        </Pressable>
+
+        {isYesChecked && (
+          <TextInput
+            style={styles.inputagent}
+            placeholder="Agent Code"
+            placeholderTextColor="black"
+            value={agentCode}
+            onChangeText={setAgentCode}
+          />
+        )}
+      </View>
+
+
             <TextInput
               style={styles.input}
               placeholder="Email Address"
@@ -221,6 +287,12 @@ export default function Index() {
               keyboardType="email-address"
               onChangeText={(value) => setEmailAddress(value)}
             />
+
+
+
+
+
+
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -323,7 +395,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   eyeButtonText: {
-    color: Colors.newYearTheme.background,
+    color: Colors.redTheme.background,
   },
   submitButton: {
     width: width * 0.95,
@@ -345,5 +417,47 @@ const styles = StyleSheet.create({
   },
   androidSafeArea: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+
+
+  inlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap', // wraps on smaller screens
+    gap: 10,
+    marginBottom:'10',
+    marginTop:'10',
+  },
+  labelagent: {
+    fontSize: 15,
+    fontWeight: '400',
+    marginRight: 10,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  checkbox: {
+    height: 20,
+    width: 20,
+    borderWidth: 1,
+    borderColor: 'black',
+    marginRight: 5,
+    borderRadius: 4,
+  },
+  checkedBox: {
+    backgroundColor: 'red',
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    marginRight: 5,
+  },
+  inputagent: {
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 5,
+    padding: 8,
+    width: 150,
   },
 });
