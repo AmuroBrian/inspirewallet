@@ -6,6 +6,8 @@ import {
   View,
   TouchableWithoutFeedback,
   SafeAreaView,
+ 
+  Pressable,
   Platform,
   StatusBar,
   TextInput,
@@ -30,7 +32,7 @@ import { registerIndieID, unregisterIndieDevice } from "native-notify";
 
 const { width } = Dimensions.get("window");
 
-export default function Index() {
+export default function Index() {  
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -51,6 +53,21 @@ export default function Index() {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [agentCode, setAgentCode] = useState();
+
+  const [isYesChecked, setIsYesChecked] = useState(false);
+  const [isNoChecked, setIsNoChecked] = useState(false);
+
+  const handleYes = () => {
+    setIsYesChecked(true);
+    setIsNoChecked(false);
+  };
+
+  const handleNo = () => {
+    setIsNoChecked(true);
+    setIsYesChecked(false);
+    setAgentCode('');
+  };
+
 
   const ConfirmPassMethod = () => {
     if (password === confirmPass) {
@@ -231,12 +248,38 @@ export default function Index() {
               placeholderTextColor="black"
               onChangeText={(value) => setLastName(value)}
             />
-            <TextInput
+            {/* <TextInput
               style={styles.input}
               placeholder="Agent Code"
               placeholderTextColor="black"
               onChangeText={(value) => setAgentCode(value)}
-            />
+            /> */}
+
+<View style={styles.inlineRow}>
+        <Text style={styles.labelagent}>Agent</Text>
+
+        <Pressable style={styles.checkboxContainer} onPress={handleYes}>
+          <View style={[styles.checkbox, isYesChecked && styles.checkedBox]} />
+          <Text style={styles.checkboxLabel}>Yes</Text>
+        </Pressable>
+
+        <Pressable style={styles.checkboxContainer} onPress={handleNo}>
+          <View style={[styles.checkbox, isNoChecked && styles.checkedBox]} />
+          <Text style={styles.checkboxLabel}>No</Text>
+        </Pressable>
+
+        {isYesChecked && (
+          <TextInput
+            style={styles.inputagent}
+            placeholder="Agent Code"
+            placeholderTextColor="black"
+            value={agentCode}
+            onChangeText={setAgentCode}
+          />
+        )}
+      </View>
+
+
             <TextInput
               style={styles.input}
               placeholder="Email Address"
@@ -244,6 +287,12 @@ export default function Index() {
               keyboardType="email-address"
               onChangeText={(value) => setEmailAddress(value)}
             />
+
+
+
+
+
+
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -368,5 +417,47 @@ const styles = StyleSheet.create({
   },
   androidSafeArea: {
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+
+
+  inlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap', // wraps on smaller screens
+    gap: 10,
+    marginBottom:'10',
+    marginTop:'10',
+  },
+  labelagent: {
+    fontSize: 15,
+    fontWeight: '400',
+    marginRight: 10,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  checkbox: {
+    height: 20,
+    width: 20,
+    borderWidth: 1,
+    borderColor: 'black',
+    marginRight: 5,
+    borderRadius: 4,
+  },
+  checkedBox: {
+    backgroundColor: 'red',
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    marginRight: 5,
+  },
+  inputagent: {
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 5,
+    padding: 8,
+    width: 150,
   },
 });
