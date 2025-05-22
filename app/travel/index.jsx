@@ -44,7 +44,7 @@ export default function Index() {
   const [openGender, setOpenGender] = useState(false);
   const [openCivilStatus, setOpenCivilStatus] = useState(false);
   const [type, setType] = useState(null);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [placeholderDate, setPlaceHolderDate] = useState("Enter Birthdate");
@@ -431,7 +431,44 @@ export default function Index() {
     }
 
     setLoading(true); // Start loading
-    createOrder();
+    try {
+      await send(
+        process.env.EXPO_PUBLIC_SERVICE_ID,
+        process.env.EXPO_PUBLIC_TEMPLATE_ID,
+        {
+          emailAddress,
+          message: `Type: Travel Protection\nName: ${userData.firstName} ${userData.lastName}\nEmail Address: ${emailAddress}\nLandline Number: ${landlineNumber}\nGender: ${gender}\nBirthdate: ${date}\nAddress: ${address}\nSource of Fund: ${sourceFund}\nGross Monthly Income: ${grossIncome}\nCivil Status: ${civilStatus}\nCitizenship: ${citizenShip}\nCash On Hand: ${cashOnHand}\nStay In Address: ${stayInAddress}\nStay Date: ${startDateStayIn}\nStay In Duration: ${stayInDuration}\nAirline Type: ${airlineType}\nArrival Time: ${arrivalTime}\nDeparture Time: ${departureTime}\nPassport Number: ${passportNumber}\nPurpose: ${purpose}`,
+        },
+        {
+          publicKey: process.env.EXPO_PUBLIC_API_KEY,
+        }
+      );
+
+      console.log("SUCCESS!");
+
+      if (Platform.OS === "ios") {
+        Alert.alert("SUCCESS", "It is successfully sent", ["OK"]);
+      } else if (Platform.OS === "android") {
+        ToastAndroid.show("Successfully sent!", ToastAndroid.SHORT);
+      }
+      router.back();
+    } catch (err) {
+      if (err instanceof EmailJSResponseStatus) {
+        console.log("EmailJS Request Failed...", err);
+      }
+
+      console.log("ERROR", err);
+      if (Platform.OS === "ios") {
+        Alert.alert("FAILURE", "It is unsuccessfully sent", ["OK"]);
+      } else if (Platform.OS === "android") {
+        ToastAndroid.show(
+          "Unsuccessfully Sent, Please Try Again Later",
+          ToastAndroid.SHORT
+        );
+      }
+    } finally {
+      setLoading(false); // Stop loading
+    }
   };
 
   if (loading) {
