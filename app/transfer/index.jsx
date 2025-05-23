@@ -79,7 +79,7 @@ export default function Transfer() {
         to_email: recipientEmail,
         transfer_type: formattedBalanceType,
         date: new Date().toLocaleString(),
-        amount: `$${parseFloat(amount).toFixed(2)}`,
+        amount: `${parseFloat(amount).toFixed(2)}`,
         sender_name: senderName,
         recipient_name: recipientName,
         sender_first_name: senderData.firstName,
