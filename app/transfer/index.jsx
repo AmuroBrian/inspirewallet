@@ -23,6 +23,7 @@ import {
 } from "firebase/firestore";
 import { send, EmailJSResponseStatus } from "@emailjs/react-native";
 import LoadingScreen from "../../components/LoadingScreen";
+import axios from "axios";
 
 export default function Transfer() {
   const navigation = useNavigation();
@@ -164,10 +165,33 @@ export default function Transfer() {
         balanceType
       );
 
+      // Send notification to sender
+      await axios.post("https://app.nativenotify.com/api/indie/notification", {
+        subID: currentUser.uid,
+        appId: 28259,
+        appToken: "QAg2EVLUAIEiCtThmFoSv2",
+        title: "Transfer Successful",
+        message: `You have successfully transferred PHP ${transferAmount.toFixed(
+          2
+        )} to ${recipientData.firstName} ${recipientData.lastName}`,
+      });
+
+      // Send notification to recipient
+      await axios.post("https://app.nativenotify.com/api/indie/notification", {
+        subID: recipientId,
+        appId: 28259,
+        appToken: "QAg2EVLUAIEiCtThmFoSv2",
+        title: "Money Received",
+        message: `You have received PHP ${transferAmount.toFixed(2)} from ${
+          senderData.firstName
+        } ${senderData.lastName}`,
+      });
+
       setShowBalanceOptions(false);
       Alert.alert("Success", "Transfer completed successfully");
       router.back();
     } catch (error) {
+      console.error("Transfer error:", error);
       Alert.alert("Error", "Transfer failed. Please try again.");
     } finally {
       setIsLoading(false);
