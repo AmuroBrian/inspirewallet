@@ -208,22 +208,16 @@ export default function Index() {
                 value={email}
               />
               <Text style={{ paddingLeft: 10, paddingRight: 10 }}>
-                By submitting this amount, we will receive an email confirming
-                your investment or stock purchase details. Please note that
-                approval for the request will take about 2–3 working days.
+                By submitting these details, we will receive an email confirming
+                bank account details. Please note that this process will take
+                about 5–7 working days.
               </Text>
-              <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
-                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
-              </TouchableOpacity>
               <TouchableOpacity
-                style={styles.submitPaypalButton}
-                onPress={() =>
-                  Linking.openURL(
-                    "https://www.paypal.com/ncp/payment/8SB8AW72XCHPJ"
-                  )
-                }
+                style={styles.submitButton}
+                onPress={onSubmit}
+                disabled={isLoading}
               >
-                <Text style={styles.submitPaypalText}>PAY VIA PAYPAL</Text>
+                <Text style={styles.submitButtonText}>SUBMIT REQUEST</Text>
               </TouchableOpacity>
               <CurrencyConverter />
             </View>
@@ -272,21 +266,6 @@ const styles = StyleSheet.create({
     width: "100%",
     fontSize: 15,
     color: Colors.newYearTheme.text,
-    fontWeight: "600",
-  },
-  submitPaypalButton: {
-    width: "70%",
-    backgroundColor: "blue",
-    padding: 10,
-    borderRadius: 15,
-    margin: 20,
-    alignSelf: "center",
-  },
-  submitPaypalText: {
-    textAlign: "center",
-    width: "100%",
-    fontSize: 15,
-    color: "white",
     fontWeight: "600",
   },
 });

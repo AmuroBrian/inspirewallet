@@ -38,6 +38,14 @@ export default function Index() {
     },
     {
       id: "2",
+      title: "Transfer",
+      iconSource: require("../../assets/images/transfer.png"),
+      routeData: () => {
+        router.push("/transfer");
+      },
+    },
+    {
+      id: "3",
       title: "Agent",
       iconSource: require("../../assets/images/agentdashboard.png"),
       routeData: () => {
@@ -45,7 +53,7 @@ export default function Index() {
       },
     },
     {
-      id: "3",
+      id: "4",
       title: "Stockholder",
       iconSource: require("../../assets/images/stock.png"),
       routeData: () => {
@@ -53,7 +61,7 @@ export default function Index() {
       },
     },
     {
-      id: "4",
+      id: "5",
       title: "Inspire Cards",
       iconSource: require("../../assets/images/card.png"),
       routeData: () => {
@@ -61,7 +69,7 @@ export default function Index() {
       },
     },
     {
-      id: "5",
+      id: "6",
       title: "Maya",
       iconSource: require("../../assets/images/maya.png"),
       routeData: () => {
@@ -69,7 +77,7 @@ export default function Index() {
       },
     },
     {
-      id: "6",
+      id: "7",
       title: "Banking Service",
       iconSource: require("../../assets/images/finance.png"),
       routeData: () => {
@@ -83,7 +91,7 @@ export default function Index() {
     //   routeData: null,
     // },
     {
-      id: "7",
+      id: "8",
       title: "Crypto",
       iconSource: require("../../assets/images/crypto.png"),
       routeData: null,
@@ -95,7 +103,7 @@ export default function Index() {
     //   routeData: null,
     // },
     {
-      id: "8",
+      id: "9",
       title: "Events",
       iconSource: require("../../assets/images/event.png"),
       routeData: () => {
@@ -103,7 +111,7 @@ export default function Index() {
       },
     },
     {
-      id: "9",
+      id: "10",
       title: "Travel Protection",
       iconSource: require("../../assets/images/travel.png"),
       routeData: () => {
@@ -111,7 +119,7 @@ export default function Index() {
       },
     },
     {
-      id: "10",
+      id: "11",
       title: "Privacy Policy",
       iconSource: require("../../assets/images/privacypolicy.png"),
       routeData: () => {
@@ -119,7 +127,7 @@ export default function Index() {
       },
     },
     {
-      id: "11",
+      id: "12",
       title: "Passcode",
       iconSource: require("../../assets/images/passcode.png"),
       routeData: () => {
@@ -127,7 +135,7 @@ export default function Index() {
       },
     },
     {
-      id: "12",
+      id: "13",
       title: "Terms & Conditions",
       iconSource: require("../../assets/images/termsandcondition.png"),
       routeData: () => {
@@ -135,7 +143,7 @@ export default function Index() {
       },
     },
     {
-      id: "13",
+      id: "14",
       title: "About Us",
       iconSource: require("../../assets/images/aboutus.png"),
       routeData: () => {
@@ -143,7 +151,7 @@ export default function Index() {
       },
     },
     {
-      id: "14",
+      id: "15",
       title: "Help Center",
       iconSource: require("../../assets/images/helpcenter.png"),
       routeData: () => {
