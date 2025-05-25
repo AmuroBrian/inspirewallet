@@ -25,6 +25,7 @@ import {
 import AgentAmountContent from "../../components/AgentAmountContent";
 import TransactionDisplay from "../../components/AgentTransaction";
 import { Colors } from "../../constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -41,7 +42,13 @@ export default function Index() {
       const userDocRef = doc(firestore, "users", user.uid);
       const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
-          setUserData(doc.data());
+          const userData = doc.data();
+          setUserData(userData);
+          // The agentWalletAmount will automatically update through userData
+          console.log(
+            "Agent Wallet Amount Updated:",
+            userData.agentWalletAmount
+          );
         } else {
           Alert.alert("Error", "No user data found");
         }
@@ -56,6 +63,15 @@ export default function Index() {
       headerShown: true,
       headerTitle: "Agent Dashboard",
       headerTransparent: true,
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 

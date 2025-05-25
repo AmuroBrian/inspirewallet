@@ -34,6 +34,7 @@ import {
 import { storage, auth } from "../../configs/firebase";
 import axios from "axios";
 import LoadingScreen from "../../components/LoadingScreen";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -109,6 +110,15 @@ export default function Index() {
       headerShown: true,
       headerTransparent: true,
       headerTitle: "Travel Protection",
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 

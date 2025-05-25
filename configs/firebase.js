@@ -10,7 +10,7 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyD2MVTPMsY3XlgzcIjDWqfJTWP1CsdnFvY",
+    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
     authDomain: "inspire-wallet.firebaseapp.com",
     projectId: "inspire-wallet",
     storageBucket: "inspire-wallet.appspot.com",

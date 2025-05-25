@@ -21,6 +21,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { Colors } from "../../constants/Colors";
 import LoadingScreen from "../../components/LoadingScreen";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -117,6 +118,15 @@ export default function Index() {
       headerShown: true,
       headerTitle: "Inspire Cards",
       headerTransparent: true,
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 

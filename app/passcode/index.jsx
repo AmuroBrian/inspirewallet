@@ -11,6 +11,7 @@ import { router, useNavigation } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 const auth = getAuth();
 const db = getFirestore();
@@ -30,7 +31,16 @@ export default function Passcode() {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
-      headerTitle: "PASSCODE SETUP",
+      headerTitle: "Passcode",
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
 
     checkExistingPasscode();

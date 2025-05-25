@@ -17,6 +17,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import StockContent from "../../components/StockContent";
 import StockTransaction from "../../components/StockTransaction";
 import { Colors } from "../../constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -48,6 +49,15 @@ export default function Index() {
       headerShown: true,
       headerTitle: "Stockholder Dashboard",
       headerTransparent: true,
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 

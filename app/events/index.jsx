@@ -7,11 +7,14 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import React from "react";
 import EventsComponent from "../../components/EventsComponent";
 import { useEffect, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -19,8 +22,17 @@ export default function Index() {
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      headerTitle: "Events",
       headerTransparent: true,
+      headerTitle: "Events",
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 
@@ -29,15 +41,13 @@ export default function Index() {
       source={require("../../assets/images/bg2.png")}
       style={styles.container}
     >
-      <SafeAreaView style={styles.androidSafeArea} />
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.mainContainer}>
-          <SafeAreaView style={styles.androidSafeArea} />
-          <EventsComponent />
-          <SafeAreaView style={styles.androidSafeArea} />
-        </View>
-      </TouchableWithoutFeedback>
-      <SafeAreaView style={styles.androidSafeArea} />
+      <SafeAreaView style={styles.androidSafeArea}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.mainContainer}>
+            <EventsComponent />
+          </View>
+        </TouchableWithoutFeedback>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
@@ -45,7 +55,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "left",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
   mainContainer: {
@@ -57,6 +67,5 @@ const styles = StyleSheet.create({
   },
   androidSafeArea: {
     paddingTop: Platform.OS === "android" ? 80 : 0,
-    opacity: 0,
   },
 });

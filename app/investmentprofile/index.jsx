@@ -23,6 +23,8 @@ import {
   collection,
 } from "firebase/firestore";
 import InvestmentProfileButtons from "../../components/InvestmentProfileButtons";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
@@ -54,6 +56,15 @@ export default function Index() {
       headerShown: true,
       headerTitle: "Investment Profile",
       headerTransparent: true,
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 

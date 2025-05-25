@@ -6,7 +6,6 @@ import {
   View,
   TouchableWithoutFeedback,
   SafeAreaView,
- 
   Pressable,
   Platform,
   StatusBar,
@@ -32,7 +31,7 @@ import { registerIndieID, unregisterIndieDevice } from "native-notify";
 
 const { width } = Dimensions.get("window");
 
-export default function Index() {  
+export default function Index() {
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -65,9 +64,8 @@ export default function Index() {
   const handleNo = () => {
     setIsNoChecked(true);
     setIsYesChecked(false);
-    setAgentCode('');
+    setAgentCode(0);
   };
-
 
   const ConfirmPassMethod = () => {
     if (password === confirmPass) {
@@ -100,6 +98,16 @@ export default function Index() {
       return;
     }
 
+    // Validate agent code if user is an agent
+    if (isYesChecked && !agentCode) {
+      if (Platform.OS === "ios") {
+        Alert.alert("Error", "Please enter an agent code.", ["OK"]);
+      } else if (Platform.OS === "android") {
+        ToastAndroid.show("Please enter an agent code.", ToastAndroid.SHORT);
+      }
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -118,7 +126,7 @@ export default function Index() {
       await setDoc(doc(firestore, "users", user.uid), {
         firstName,
         lastName,
-        agentCode: agentCode,
+        agentCode: isYesChecked ? agentCode : 0,
         stockAmount: 0,
         walletAmount: 0,
         timeDepositAmount: 0,
@@ -132,9 +140,18 @@ export default function Index() {
         dollarWalletAmount: 0,
         cryptoWalletAmount: 0,
         createdAt: now,
-        agent: false,
+        agent: isYesChecked,
         lastSignedIn: now,
         stock: false,
+        cryptoBalances: {
+          BTC: 0,
+          ETH: 0,
+          USDT: 0,
+        },
+        currencyBalances: {
+          USD: 0,
+          JPY: 0,
+        },
       });
 
       await addDoc(collection(firestore, "users", user.uid, "transactions"), {
@@ -170,6 +187,17 @@ export default function Index() {
         }
       );
 
+      // Add initialization of cryptoTrades collection
+      await addDoc(collection(firestore, "users", user.uid, "cryptoTrades"), {
+        type: "INITIAL",
+        asset: "SYSTEM",
+        amount: 0,
+        amountPHP: 0,
+        price: 0,
+        totalCost: 0,
+        timestamp: now,
+      });
+
       if (Platform.OS === "android") {
         ToastAndroid.show("Successfully Registered", ToastAndroid.SHORT);
       } else if (Platform.OS === "ios") {
@@ -179,18 +207,22 @@ export default function Index() {
           ["OK"]
         );
       }
-      registerIndieID(user.uid.toString(), 28259, "QAg2EVLUAIEiCtThmFoSv2");
+      registerIndieID(
+        user.uid.toString(),
+        28259,
+        process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY
+      );
       await axios.post("https://app.nativenotify.com/api/indie/notification", {
         subID: `${user.uid}`,
         appId: 28259,
-        appToken: "QAg2EVLUAIEiCtThmFoSv2",
+        appToken: process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY,
         title: "Welcome to Inspire Wallet",
         message: "Congratulations you successfully registered your account.",
       });
       unregisterIndieDevice(
         user.uid.toString(),
         28259,
-        "QAg2EVLUAIEiCtThmFoSv2"
+        process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY
       );
       router.push("/");
     } catch (error) {
@@ -255,30 +287,33 @@ export default function Index() {
               onChangeText={(value) => setAgentCode(value)}
             /> */}
 
-<View style={styles.inlineRow}>
-        <Text style={styles.labelagent}>Agent</Text>
+            <View style={styles.inlineRow}>
+              <Text style={styles.labelagent}>Agent</Text>
 
-        <Pressable style={styles.checkboxContainer} onPress={handleYes}>
-          <View style={[styles.checkbox, isYesChecked && styles.checkedBox]} />
-          <Text style={styles.checkboxLabel}>Yes</Text>
-        </Pressable>
+              <Pressable style={styles.checkboxContainer} onPress={handleYes}>
+                <View
+                  style={[styles.checkbox, isYesChecked && styles.checkedBox]}
+                />
+                <Text style={styles.checkboxLabel}>Yes</Text>
+              </Pressable>
 
-        <Pressable style={styles.checkboxContainer} onPress={handleNo}>
-          <View style={[styles.checkbox, isNoChecked && styles.checkedBox]} />
-          <Text style={styles.checkboxLabel}>No</Text>
-        </Pressable>
+              <Pressable style={styles.checkboxContainer} onPress={handleNo}>
+                <View
+                  style={[styles.checkbox, isNoChecked && styles.checkedBox]}
+                />
+                <Text style={styles.checkboxLabel}>No</Text>
+              </Pressable>
 
-        {isYesChecked && (
-          <TextInput
-            style={styles.inputagent}
-            placeholder="Agent Code"
-            placeholderTextColor="black"
-            value={agentCode}
-            onChangeText={setAgentCode}
-          />
-        )}
-      </View>
-
+              {isYesChecked && (
+                <TextInput
+                  style={styles.inputagent}
+                  placeholder="Agent Code"
+                  placeholderTextColor="black"
+                  value={agentCode}
+                  onChangeText={setAgentCode}
+                />
+              )}
+            </View>
 
             <TextInput
               style={styles.input}
@@ -287,11 +322,6 @@ export default function Index() {
               keyboardType="email-address"
               onChangeText={(value) => setEmailAddress(value)}
             />
-
-
-
-
-
 
             <View style={styles.passwordContainer}>
               <TextInput
@@ -419,35 +449,34 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
 
-
   inlineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap', // wraps on smaller screens
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap", // wraps on smaller screens
     gap: 10,
-    marginBottom:'10',
-    marginTop:'10',
+    marginBottom: "10",
+    marginTop: "10",
   },
   labelagent: {
     fontSize: 15,
-    fontWeight: '400',
+    fontWeight: "400",
     marginRight: 10,
   },
   checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginRight: 10,
   },
   checkbox: {
     height: 20,
     width: 20,
     borderWidth: 1,
-    borderColor: 'black',
+    borderColor: "black",
     marginRight: 5,
     borderRadius: 4,
   },
   checkedBox: {
-    backgroundColor: 'red',
+    backgroundColor: "red",
   },
   checkboxLabel: {
     fontSize: 16,
@@ -455,7 +484,7 @@ const styles = StyleSheet.create({
   },
   inputagent: {
     borderWidth: 1,
-    borderColor: 'black',
+    borderColor: "black",
     borderRadius: 5,
     padding: 8,
     width: 150,

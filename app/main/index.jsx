@@ -12,6 +12,8 @@ import {
   Platform,
   Dimensions,
   FlatList,
+  Modal,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
@@ -28,15 +30,16 @@ import axios from "axios";
 import { registerIndieID } from "native-notify";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const width = Dimensions.get("window").width;
+
 export default function Index() {
   const navigation = useNavigation();
   const router = useRouter();
-  const width = Dimensions.get("window").width;
 
   registerIndieID(
     auth.currentUser.uid.toString(),
     28259,
-    "QAg2EVLUAIEiCtThmFoSv2"
+    process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY
   );
 
   // Sample navigation data
@@ -156,30 +159,19 @@ export default function Index() {
                 </Text>
               </View>
 
-              {/* Menu Button */}
+              {/* Menu and Info Buttons */}
               <View
                 style={{
-                  alignItems: "flex-end",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
                   paddingBottom: 10,
                   paddingRight: 10,
                   width: "100%",
+                  gap: 10,
                 }}
               >
                 <TouchableOpacity
-                  style={{
-                    backgroundColor: Colors.newYearTheme.background,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: 10,
-                    borderRadius: 10,
-                    height: 40,
-                    width: width * 0.25,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 3,
-                    elevation: 5,
-                  }}
+                  style={styles.menuButton}
                   onPress={() => {
                     router.replace("settings");
                   }}
@@ -202,7 +194,7 @@ export default function Index() {
               <DollarDepositContent
                 dollarDepositAmount={data.dollarDepositAmount || 0}
               />
-              <USDTAmountContent usdtAmount={data.usdtAmount || 0} />
+              <USDTAmountContent usdtAmount={data.cryptoBalances?.USDT || 0} />
             </View>
           }
           ListFooterComponent={
@@ -333,5 +325,60 @@ const styles = StyleSheet.create({
     margin: 5,
     borderColor: "black",
     borderWidth: 2,
+  },
+  menuButton: {
+    backgroundColor: Colors.newYearTheme.background,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10,
+    height: 40,
+    width: width * 0.25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+    width: "90%",
+    maxHeight: "80%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 15,
+    lineHeight: 24,
+  },
+  closeButton: {
+    backgroundColor: Colors.newYearTheme.background,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: Colors.newYearTheme.text,
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
