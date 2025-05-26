@@ -92,7 +92,7 @@ export default function Index() {
     // },
     {
       id: "8",
-      title: "Crypto",
+      title: "Trading",
       iconSource: require("../../assets/images/crypto.png"),
       routeData: () => {
         router.push("crypto");
