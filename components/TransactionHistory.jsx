@@ -5,6 +5,7 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import {
   getFirestore,
@@ -20,6 +21,7 @@ const TransactionHistory = ({ userId }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const windowWidth = Dimensions.get("window").width;
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -78,22 +80,39 @@ const TransactionHistory = ({ userId }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width: windowWidth - 20 }]}>
       <FlatList
         data={transactions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.transactionBox}>
             <View style={styles.transactionItem}>
-              <Text style={styles.transactionText}>{item.type}</Text>
+              <Text
+                style={[
+                  styles.transactionText,
+                  { fontSize: windowWidth < 360 ? 12 : 15 },
+                ]}
+              >
+                {item.type}
+              </Text>
             </View>
             <View style={styles.transactionItem}>
-              <Text style={styles.transactionText}>
+              <Text
+                style={[
+                  styles.transactionText,
+                  { fontSize: windowWidth < 360 ? 12 : 15 },
+                ]}
+              >
                 {item.date.toLocaleDateString()}
               </Text>
             </View>
             <View style={styles.transactionItem}>
-              <Text style={styles.transactionText}>
+              <Text
+                style={[
+                  styles.transactionText,
+                  { fontSize: windowWidth < 360 ? 12 : 15 },
+                ]}
+              >
                 ₱ {item.amount.toFixed(2)}
               </Text>
             </View>
@@ -108,7 +127,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    width: "100%",
     margin: 10,
   },
   transactionBox: {
@@ -118,7 +136,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 5,
     alignItems: "center",
-    height: 50,
+    minHeight: 50,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -129,10 +147,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 5,
   },
   transactionText: {
-    fontSize: 15,
     color: Colors.newYearTheme.text,
+    textAlign: "center",
   },
 });
 

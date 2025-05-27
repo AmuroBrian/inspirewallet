@@ -7,7 +7,9 @@ export default function TimeDepositContent({ timeDepositAmount }) {
     if (isNaN(numberValue)) {
       return "loading data...";
     }
-    const numStr = numberValue.toString().replace(/,/g, "");
+    // Round to 2 decimal places
+    const roundedValue = Math.round(numberValue * 100) / 100;
+    const numStr = roundedValue.toString().replace(/,/g, "");
     const formattedStr = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return `PHP ${formattedStr}`;
   };

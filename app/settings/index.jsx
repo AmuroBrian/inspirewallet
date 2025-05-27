@@ -94,7 +94,9 @@ export default function Index() {
       id: "8",
       title: "Crypto",
       iconSource: require("../../assets/images/crypto.png"),
-      routeData: null,
+      routeData: () => {
+        router.push("crypto");
+      },
     },
     // {
     //   id: "9",
@@ -218,52 +220,24 @@ export default function Index() {
         data={DATA}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={3} // Set the number of columns to 3
+        numColumns={3}
+        ListFooterComponent={() => (
+          <View style={styles.footerContainer}>
+            <TouchableOpacity
+              style={styles.fullWidthButton}
+              onPress={() => router.push("accountdeletion")}
+            >
+              <Text style={styles.fullWidthButtonText}>DELETE ACCOUNT</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.fullWidthButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.fullWidthButtonText}>LOG OUT</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       />
-
-      <TouchableOpacity
-        style={{
-          backgroundColor: "red",
-          borderRadius: 25,
-          margin: 5,
-          justifyContent: "center",
-          alignItems: "center",
-          width: "95%",
-          height: 40,
-        }}
-        onPress={() => router.push("accountdeletion")}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontWeight: "800",
-          }}
-        >
-          DELETE ACCOUNT
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "red",
-          borderRadius: 25,
-          margin: 5,
-          justifyContent: "center",
-          alignItems: "center",
-          width: "95%",
-          height: 40,
-        }}
-        onPress={handleLogout}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontWeight: "800",
-          }}
-        >
-          LOG OUT
-        </Text>
-      </TouchableOpacity>
-
       <SafeAreaView style={styles.androidSafeArea1} />
     </ImageBackground>
   );
@@ -292,14 +266,16 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   item: {
-    flex: 1, // Allow the item to grow and fill space
-    margin: 5, // Add some space around each item
+    flex: 1,
+    margin: 5,
     alignItems: "center",
     justifyContent: "center",
+    minWidth: Dimensions.get("window").width / 3.5,
   },
   list: {
-    flex: 1, // Ensure FlatList takes full height
+    flex: 1,
     width: "100%",
+    paddingHorizontal: 5,
   },
   soonBadge: {
     position: "absolute",
@@ -314,5 +290,26 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 10,
     fontWeight: "bold",
+  },
+  footerContainer: {
+    width: "100%",
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    marginTop: 10,
+  },
+  fullWidthButton: {
+    backgroundColor: "red",
+    borderRadius: 25,
+    marginVertical: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "95%",
+    height: 45,
+    alignSelf: "center",
+  },
+  fullWidthButtonText: {
+    color: "white",
+    fontWeight: "800",
+    fontSize: 14,
   },
 });

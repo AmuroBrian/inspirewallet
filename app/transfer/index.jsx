@@ -24,6 +24,7 @@ import {
 import { send, EmailJSResponseStatus } from "@emailjs/react-native";
 import LoadingScreen from "../../components/LoadingScreen";
 import axios from "axios";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Transfer() {
   const navigation = useNavigation();
@@ -39,6 +40,15 @@ export default function Transfer() {
       headerShown: true,
       headerTransparent: true,
       headerTitle: "Transfer",
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 
@@ -156,6 +166,27 @@ export default function Transfer() {
         userId: currentUser.uid,
       };
 
+      // Add transaction to sender's history
+      await addDoc(
+        collection(firestore, `users/${currentUser.uid}/transactions`),
+        {
+          amount: transferAmount,
+          date: new Date(),
+          type: "Transfer Money",
+          recipientEmail: email,
+          recipientName: `${recipientData.firstName} ${recipientData.lastName}`,
+        }
+      );
+
+      // Add transaction to recipient's history
+      await addDoc(collection(firestore, `users/${recipientId}/transactions`), {
+        amount: transferAmount,
+        date: new Date(),
+        type: "Transfer Received",
+        senderEmail: senderData.emailAddress,
+        senderName: `${senderData.firstName} ${senderData.lastName}`,
+      });
+
       await addDoc(collection(firestore, "transactions"), transactionData);
 
       await sendTransferEmail(
@@ -169,7 +200,7 @@ export default function Transfer() {
       await axios.post("https://app.nativenotify.com/api/indie/notification", {
         subID: currentUser.uid,
         appId: 28259,
-        appToken: "QAg2EVLUAIEiCtThmFoSv2",
+        appToken: process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY,
         title: "Transfer Successful",
         message: `You have successfully transferred PHP ${transferAmount.toFixed(
           2
@@ -180,7 +211,7 @@ export default function Transfer() {
       await axios.post("https://app.nativenotify.com/api/indie/notification", {
         subID: recipientId,
         appId: 28259,
-        appToken: "QAg2EVLUAIEiCtThmFoSv2",
+        appToken: process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY,
         title: "Money Received",
         message: `You have received PHP ${transferAmount.toFixed(2)} from ${
           senderData.firstName
@@ -208,6 +239,15 @@ export default function Transfer() {
       style={styles.container}
     >
       <SafeAreaView style={styles.androidSafeArea} />
+      <View style={styles.instructionsContainer}>
+        <Text style={styles.instructionsTitle}>How to Transfer Money</Text>
+        <Text style={styles.instructionsText}>
+          1. Enter the recipient's email address{"\n"}
+          2. Enter the amount you want to transfer{"\n"}
+          3. Click "Transfer" button{"\n"}
+          4. Select which balance to use (Available Balance or Agent Wallet)
+        </Text>
+      </View>
       <TextInput
         placeholder="Enter Email Address"
         style={styles.input}
@@ -344,5 +384,31 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: "#666",
     marginTop: 20,
+  },
+  instructionsContainer: {
+    width: "90%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 15,
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  instructionsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: Colors.redTheme.background,
+    marginBottom: 10,
+  },
+  instructionsText: {
+    fontSize: 14,
+    color: "#333",
+    lineHeight: 22,
   },
 });

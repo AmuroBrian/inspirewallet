@@ -13,19 +13,30 @@ import {
   Platform,
   ToastAndroid,
 } from "react-native";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { send, EmailJSResponseStatus } from "@emailjs/react-native";
 import { ScrollView } from "react-native";
 import { Colors } from "../../constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Index() {
   const navigation = useNavigation();
+  const router = useRouter();
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,
       headerTransparent: true,
       headerTitle: "Help Center",
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={Colors.redTheme.background}
+          />
+        </TouchableOpacity>
+      ),
     });
   }, []);
 

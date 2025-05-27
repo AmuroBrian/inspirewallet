@@ -34,7 +34,7 @@ import axios from "axios";
 
 export default function Index() {
   // Wrap the registerNNPushToken call in a try-catch to prevent crashes
-  registerNNPushToken(28259, "QAg2EVLUAIEiCtThmFoSv2");
+  registerNNPushToken(28259, process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY);
 
   const router = useRouter();
   const navigation = useNavigation();
@@ -439,10 +439,38 @@ export default function Index() {
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
+
+        // Get the old user ID from AsyncStorage
+        const oldUserId = await AsyncStorage.getItem("userid");
+
+        // If there was a previous user, unregister their device
+        if (oldUserId) {
+          try {
+            await unregisterIndieDevice(oldUserId);
+            console.log("Unregistered old user device from native-notify");
+          } catch (error) {
+            console.error("Error unregistering old user device:", error);
+          }
+        }
+
+        // Clear AsyncStorage and set new user data
         await AsyncStorage.clear();
         await AsyncStorage.setItem("userEmail", email);
         await AsyncStorage.setItem("userPassword", password);
         await AsyncStorage.setItem("userid", user.uid);
+
+        // Register the new user's device
+        try {
+          await registerIndieID(
+            user.uid,
+            28259,
+            process.env.EXPO_PUBLIC_NATIVENOTIFY_API_KEY
+          );
+          console.log("Registered new user device to native-notify");
+        } catch (error) {
+          console.error("Error registering new user device:", error);
+        }
+
         setTimeout(() => {
           setLoadingScreen(false);
           router.replace("/main");

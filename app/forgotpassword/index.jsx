@@ -12,14 +12,18 @@ import {
   Alert,
   Platform,
   ToastAndroid,
+  Modal,
 } from "react-native";
 import { useNavigation } from "expo-router";
-import { send, EmailJSResponseStatus } from "@emailjs/react-native";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { ScrollView } from "react-native";
 import { Colors } from "../../constants/Colors";
 
 export default function Index() {
   const navigation = useNavigation();
+  const auth = getAuth();
+  const [emailAddress, setEmailAddress] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -29,53 +33,35 @@ export default function Index() {
     });
   }, []);
 
-  const [firstName, setFirstName] = useState();
-  const [lastName, setLastName] = useState();
-  const [emailAddress, setEmailAddress] = useState();
-  const [reason, setReason] = useState();
-
   const onSubmit = async () => {
-    if (!firstName || !lastName || !emailAddress || !reason) {
+    if (!emailAddress) {
       if (Platform.OS === "ios") {
-        Alert.alert("MISSING INFORMATION", "Please fill in all the fields", [
+        Alert.alert("MISSING INFORMATION", "Please enter your email address", [
           "OK",
         ]);
       } else if (Platform.OS === "android") {
-        ToastAndroid.show("Please fill in all the fields", ToastAndroid.SHORT);
+        ToastAndroid.show(
+          "Please enter your email address",
+          ToastAndroid.SHORT
+        );
       }
-      return; // Stop execution if any field is empty
+      return;
     }
 
     try {
-      await send(
-        process.env.EXPO_PUBLIC_SERVICE_ID,
-        process.env.EXPO_PUBLIC_TEMPLATE_ID,
-        {
-          email: emailAddress,
-          message: `First Name: ${firstName}\nLast Name: ${lastName}\nEmail Address: ${emailAddress}\nType of Request: Forgot Password Request\nReason: ${reason}`,
-        },
-        {
-          publicKey: process.env.EXPO_PUBLIC_API_KEY,
-        }
-      );
-
-      console.log("SUCCESS!");
+      await sendPasswordResetEmail(auth, emailAddress);
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
       if (Platform.OS === "ios") {
-        Alert.alert("SUCCESS", "It is successfully sent", ["OK"]);
-      } else if (Platform.OS === "android") {
-        ToastAndroid.show("Successfully sent!", ToastAndroid.SHORT);
-      }
-    } catch (err) {
-      if (err instanceof EmailJSResponseStatus) {
-        console.log("EmailJS Request Failed...", err);
-      }
-
-      console.log("ERROR", err);
-      if (Platform.OS === "ios") {
-        Alert.alert("FAILURE", "It is unsuccessfully sent", ["OK"]);
+        Alert.alert(
+          "ERROR",
+          "Failed to send password reset email. Please try again.",
+          ["OK"]
+        );
       } else if (Platform.OS === "android") {
         ToastAndroid.show(
-          "Unsuccessfully Sent, Please Try Again Later",
+          "Failed to send password reset email. Please try again.",
           ToastAndroid.SHORT
         );
       }
@@ -100,23 +86,9 @@ export default function Index() {
                 width: "100%",
               }}
             >
-              Please fill up the following form.
+              Please enter your email address to reset your password.
             </Text>
 
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter First Name"
-              placeholderTextColor={"black"}
-              keyboardType="default"
-              onChangeText={(value) => setFirstName(value)}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter Last Name"
-              placeholderTextColor={"black"}
-              keyboardType="default"
-              onChangeText={(value) => setLastName(value)}
-            />
             <TextInput
               style={styles.textInput}
               placeholder="Enter Email Address"
@@ -124,25 +96,7 @@ export default function Index() {
               keyboardType="email-address"
               onChangeText={(value) => setEmailAddress(value)}
             />
-            <TextInput
-              style={styles.reasonInput}
-              placeholder="Enter Reason for forgetting the password"
-              placeholderTextColor={"black"}
-              keyboardType="default"
-              multiline
-              textAlignVertical="top"
-              onChangeText={(value) => setReason(value)}
-            />
-            <Text
-              style={{
-                paddingLeft: 10,
-                paddingRight: 10,
-              }}
-            >
-              By submitting these details, we will receive an email confirming
-              your request to change your password. We will get back to you as
-              soon as possible. Thank You!
-            </Text>
+
             <TouchableOpacity
               style={{
                 width: "70%",
@@ -168,7 +122,7 @@ export default function Index() {
                   fontWeight: 600,
                 }}
               >
-                SUBMIT REQUEST
+                SEND RESET LINK
               </Text>
             </TouchableOpacity>
             <View style={{ width: "100%", height: 300 }}></View>
@@ -176,6 +130,33 @@ export default function Index() {
         </View>
       </TouchableWithoutFeedback>
       <SafeAreaView style={styles.androidSafeArea} />
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Password Reset Email Sent</Text>
+            <Text style={styles.modalText}>
+              We have sent a password reset link to your email address. Please
+              check your inbox and follow the instructions to reset your
+              password.
+            </Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setModalVisible(false);
+                navigation.goBack();
+              }}
+            >
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 }
@@ -199,15 +180,48 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "white",
   },
-  reasonInput: {
-    width: "95%",
-    height: 200,
-    borderColor: "black",
-    borderWidth: 2,
-    margin: 10,
-    borderRadius: 15,
-    padding: 10,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
     backgroundColor: "white",
-    textAlignVertical: "top",
+    borderRadius: 20,
+    padding: 20,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: Colors.newYearTheme.background,
+    padding: 10,
+    borderRadius: 15,
+    width: "50%",
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: Colors.newYearTheme.text,
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
