@@ -15,6 +15,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Modal,
+  StatusBar,
+  Animated,
+  KeyboardAvoidingView,
 } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
@@ -71,6 +74,10 @@ let priceCache = {
   timestamp: 0,
 };
 
+// Add animation configuration
+const CANDLE_ANIMATION_DURATION = 500; // 500ms for each candle animation
+const LAST_CANDLE_ANIMATION_DURATION = 1000; // 1 second for the last candle pulse
+
 // Add these helper functions at the top of the file
 const calculateTrendLine = (data) => {
   const n = data.length;
@@ -126,16 +133,65 @@ const isCacheValid = (timestamp) => {
   return Date.now() - timestamp < CACHE_DURATION;
 };
 
-// Add Chart Component
+// Modify the ChartComponent to include proper animation initialization
 const ChartComponent = React.memo(({ data, selectedCrypto }) => {
+  const [animations, setAnimations] = useState([]);
+  const [lastCandleAnimation] = useState(new Animated.Value(0));
+  const [lastPrice, setLastPrice] = useState(null);
+  const [isPriceIncreasing, setIsPriceIncreasing] = useState(true);
+
+  // Initialize animations when data changes
+  useEffect(() => {
+    if (data?.datasets?.[0]?.data?.length > 0) {
+      const newAnimations = data.datasets[0].data.map(
+        () => new Animated.Value(0)
+      );
+      setAnimations(newAnimations);
+
+      // Start animations
+      newAnimations.forEach((anim, index) => {
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: CANDLE_ANIMATION_DURATION,
+          delay: index * 100,
+          useNativeDriver: true,
+        }).start();
+      });
+
+      // Handle last candle animation
+      const currentPrice =
+        data.datasets[0].data[data.datasets[0].data.length - 1];
+      if (lastPrice !== null) {
+        setIsPriceIncreasing(currentPrice > lastPrice);
+      }
+      setLastPrice(currentPrice);
+
+      // Start continuous animation for the last candle
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(lastCandleAnimation, {
+            toValue: 1,
+            duration: LAST_CANDLE_ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+          Animated.timing(lastCandleAnimation, {
+            toValue: 0,
+            duration: LAST_CANDLE_ANIMATION_DURATION,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }
+  }, [data?.datasets?.[0]?.data]);
+
   const chartCalculations = useMemo(() => {
-    if (!data.datasets[0].data.length) return null;
+    if (!data?.datasets?.[0]?.data?.length) return null;
 
     const prices = data.datasets[0].data;
     const maxPrice = Math.max(...prices);
     const minPrice = Math.min(...prices);
-    const priceRange = Math.max(maxPrice - minPrice, 0.1); // Ensure minimum range
-    const padding = priceRange * 0.1; // 10% padding
+    const priceRange = Math.max(maxPrice - minPrice, 0.1);
+    const padding = priceRange * 0.1;
     const paddedMinPrice = minPrice - padding;
     const paddedMaxPrice = maxPrice + padding;
     const paddedRange = paddedMaxPrice - paddedMinPrice;
@@ -149,14 +205,14 @@ const ChartComponent = React.memo(({ data, selectedCrypto }) => {
       paddedMaxPrice,
       paddedRange,
     };
-  }, [data.datasets[0].data]);
+  }, [data?.datasets?.[0]?.data]);
 
   const ohlcData = useMemo(() => {
     if (!chartCalculations) return [];
     return calculateOHLC(chartCalculations.prices);
   }, [chartCalculations]);
 
-  if (!chartCalculations) {
+  if (!chartCalculations || !animations.length) {
     return (
       <View style={styles.noDataContainer}>
         <Text style={styles.noDataText}>No price data available</Text>
@@ -166,6 +222,14 @@ const ChartComponent = React.memo(({ data, selectedCrypto }) => {
 
   const isForex = selectedCrypto === "USD" || selectedCrypto === "JPY";
   const currencySymbol = isForex ? "₱" : "$";
+
+  // Fix the color logic
+  const getCandleColor = (isBullish, isLastCandle = false) => {
+    if (isLastCandle) {
+      return isPriceIncreasing ? "#4CAF50" : "#f44336";
+    }
+    return isBullish ? "#4CAF50" : "#f44336";
+  };
 
   return (
     <View style={styles.chartContainer}>
@@ -198,13 +262,15 @@ const ChartComponent = React.memo(({ data, selectedCrypto }) => {
 
           <View style={styles.chartContent}>
             {ohlcData.map((candle, index) => {
+              if (!animations[index]) return null;
+
+              const isLastCandle = index === ohlcData.length - 1;
               const isBullish = candle.close >= candle.open;
               const candleWidth = 6;
               const spacing = 4;
               const totalWidth = candleWidth + spacing;
               const xPosition = index * totalWidth;
 
-              // Calculate Y positions with proper scaling
               const highY = Math.max(
                 0,
                 Math.min(
@@ -242,38 +308,65 @@ const ChartComponent = React.memo(({ data, selectedCrypto }) => {
                 )
               );
 
+              const candleColor = getCandleColor(isBullish, isLastCandle);
+
               return (
-                <View
+                <Animated.View
                   key={`candle-${index}`}
                   style={[
                     styles.candleContainer,
                     {
                       left: `${xPosition}%`,
                       width: `${candleWidth}%`,
+                      opacity: animations[index],
+                      transform: [
+                        {
+                          scaleY: animations[index].interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, 1],
+                          }),
+                        },
+                      ],
                     },
                   ]}
                 >
-                  <View
+                  <Animated.View
                     style={[
                       styles.candleWick,
                       {
                         top: `${highY}%`,
                         height: `${lowY - highY}%`,
-                        backgroundColor: isBullish ? "#4CAF50" : "#f44336",
+                        backgroundColor: candleColor,
+                        ...(isLastCandle && {
+                          borderWidth: 2,
+                          borderColor: candleColor,
+                          opacity: lastCandleAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0.5, 1],
+                          }),
+                        }),
                       },
                     ]}
                   />
-                  <View
+                  <Animated.View
                     style={[
                       styles.candleBody,
                       {
                         top: `${Math.min(openY, closeY)}%`,
                         height: `${Math.max(Math.abs(closeY - openY), 1)}%`,
-                        backgroundColor: isBullish ? "#4CAF50" : "#f44336",
+                        backgroundColor: candleColor,
+                        ...(isLastCandle && {
+                          borderWidth: 2,
+                          borderColor: candleColor,
+                          opacity: lastCandleAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0.5, 1],
+                          }),
+                        }),
                       },
                     ]}
                   />
-                </View>
+                </Animated.View>
               );
             })}
           </View>
@@ -304,7 +397,7 @@ const Crypto = () => {
     labels: [],
     datasets: [{ data: [] }],
   });
-  const [timeRange, setTimeRange] = useState("7d");
+  const [timeRange, setTimeRange] = useState("1m");
   const [tradeHistory, setTradeHistory] = useState([]);
   const [priceChange, setPriceChange] = useState(0);
   const [cryptoBalances, setCryptoBalances] = useState({
@@ -328,6 +421,7 @@ const Crypto = () => {
   });
   const [forexPriceChange, setForexPriceChange] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [updateInterval, setUpdateInterval] = useState(null);
 
   const screenWidth = Dimensions.get("window").width;
 
@@ -346,7 +440,7 @@ const Crypto = () => {
     fetchForexRates();
     navigation.setOptions({
       headerShown: true,
-      headerTitle: "Crypto",
+      headerTitle: "Trading",
       headerTransparent: true,
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -959,6 +1053,148 @@ const Crypto = () => {
     currencyBalances,
   ]);
 
+  // Add function to fetch 1-minute data
+  const fetchOneMinuteData = async () => {
+    try {
+      const response = await cryptoApi.get(`/v2/histominute`, {
+        params: {
+          fsym: cryptoSymbols[selectedCrypto],
+          tsym: "USD",
+          limit: 60, // Get last 60 minutes
+          aggregate: 1,
+        },
+      });
+
+      if (!response.data || response.data.Response === "Error") {
+        throw new Error(response.data?.Message || "API Error");
+      }
+
+      if (response.data.Data && response.data.Data.Data) {
+        const data = response.data.Data.Data;
+        data.sort((a, b) => a.time - b.time);
+
+        const change = calculatePriceChange(data);
+        setPriceChange(change);
+
+        const prices = data.map((item) => item.close);
+        const labels = data.map((item) => {
+          const date = new Date(item.time * 1000);
+          return `${date.getHours()}:${date
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`;
+        });
+
+        setChartData({
+          labels,
+          datasets: [{ data: prices }],
+        });
+      }
+    } catch (error) {
+      setError(`Failed to fetch 1-minute data: ${error.message}`);
+    }
+  };
+
+  // Add function to fetch 1-minute forex data
+  const fetchOneMinuteForexData = async () => {
+    try {
+      const response = await forexApi.get("", {
+        params: {
+          function: "FX_INTRADAY",
+          from_symbol: selectedCurrency,
+          to_symbol: "PHP",
+          interval: "1min",
+          apikey: ALPHA_VANTAGE_API_KEY,
+          outputsize: "compact",
+        },
+      });
+
+      if (response.data["Error Message"]) {
+        setError("API Error: " + response.data["Error Message"]);
+        return;
+      }
+
+      const timeSeriesKey = "Time Series FX (1min)";
+      if (!response.data[timeSeriesKey]) {
+        setError("Invalid data format received from API");
+        return;
+      }
+
+      const timeSeriesData = response.data[timeSeriesKey];
+      const dataPoints = Object.entries(timeSeriesData)
+        .slice(0, 60) // Get last 60 minutes
+        .reverse();
+
+      if (dataPoints.length === 0) {
+        setError("No historical data available");
+        return;
+      }
+
+      const prices = dataPoints.map(([_, data]) => {
+        const price = parseFloat(data["4. close"]);
+        if (isNaN(price)) {
+          return 0;
+        }
+        return price;
+      });
+
+      const labels = dataPoints.map(([date]) => {
+        const d = new Date(date);
+        return `${d.getHours()}:${d.getMinutes().toString().padStart(2, "0")}`;
+      });
+
+      const firstPrice = prices[0];
+      const lastPrice = prices[prices.length - 1];
+      const change = ((lastPrice - firstPrice) / firstPrice) * 100;
+      setForexPriceChange(change);
+
+      setForexChartData({
+        labels,
+        datasets: [{ data: prices }],
+      });
+    } catch (error) {
+      if (error.response) {
+        setError(
+          `API Error: ${error.response.data.message || "Unknown error"}`
+        );
+      } else if (error.request) {
+        setError("No response received from API");
+      } else {
+        setError("Failed to fetch forex historical data");
+      }
+    }
+  };
+
+  // Modify useEffect to handle time range changes
+  useEffect(() => {
+    if (selectedType === "CRYPTO") {
+      if (timeRange === "1m") {
+        fetchOneMinuteData();
+        const interval = setInterval(fetchOneMinuteData, 60000);
+        setUpdateInterval(interval);
+      } else {
+        if (updateInterval) {
+          clearInterval(updateInterval);
+          setUpdateInterval(null);
+        }
+        fetchHistoricalData();
+      }
+    } else {
+      // For forex, always use historical data
+      if (updateInterval) {
+        clearInterval(updateInterval);
+        setUpdateInterval(null);
+      }
+      fetchForexHistoricalData();
+    }
+
+    return () => {
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
+    };
+  }, [timeRange, selectedCrypto, selectedType, selectedCurrency]);
+
   const renderError = () => {
     if (!error) return null;
     return (
@@ -1050,317 +1286,332 @@ const Crypto = () => {
     );
   };
 
+  // Modify the timeRangeSelector to show different options for crypto and forex
+  const renderTimeRangeSelector = () => {
+    const timeRanges =
+      selectedType === "CRYPTO"
+        ? ["1m", "24h", "7d", "30d"]
+        : ["24h", "7d", "30d"];
+
+    return (
+      <View style={styles.timeRangeSelector}>
+        {timeRanges.map((range) => (
+          <TouchableOpacity
+            key={range}
+            style={[
+              styles.timeRangeButton,
+              timeRange === range && styles.selectedTimeRange,
+            ]}
+            onPress={() => setTimeRange(range)}
+          >
+            <Text
+              style={[
+                styles.timeRangeText,
+                timeRange === range && styles.selectedTimeRangeText,
+              ]}
+            >
+              {range}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
+
   return (
-    <ImageBackground
-      source={require("../../assets/images/bg2.png")}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.androidSafeArea} />
-      {renderInstructions()}
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.header}>
-            <View style={styles.headerTop}>
-              <Text style={styles.balanceText}>
-                Available Balance: ₱{balance.toFixed(2)}
-              </Text>
-              <TouchableOpacity
-                style={styles.instructionButton}
-                onPress={() => setShowInstructions(true)}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name="help-circle"
-                  size={24}
-                  color={Colors.redTheme.background}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.balancesContainer}>
-              <View style={styles.cryptoBalancesContainer}>
-                <Text style={styles.balanceTitle}>Crypto Balances:</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
+      <ImageBackground
+        source={require("../../assets/images/bg2.png")}
+        style={styles.container}
+      >
+        {renderInstructions()}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.keyboardAvoidingView}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+        >
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={[
+              styles.scrollViewContent,
+              Platform.OS === "android" && { paddingBottom: 100 },
+            ]}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.header}>
+              <View style={styles.headerTop}>
                 <Text style={styles.balanceText}>
-                  BTC: {cryptoBalances.BTC.toFixed(8)}
+                  Available Balance: ₱{balance.toFixed(2)}
                 </Text>
-                <Text style={styles.balanceText}>
-                  ETH: {cryptoBalances.ETH.toFixed(8)}
-                </Text>
-                <Text style={styles.balanceText}>
-                  USDT: {cryptoBalances.USDT.toFixed(8)}
-                </Text>
-              </View>
-              <View style={styles.currencyBalancesContainer}>
-                <Text style={styles.balanceTitle}>Forex Balances:</Text>
-                <Text style={styles.balanceText}>
-                  USD: {currencyBalances.USD.toFixed(2)}
-                </Text>
-                <Text style={styles.balanceText}>
-                  JPY: {currencyBalances.JPY.toFixed(2)}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.typeSelector}>
-            <TouchableOpacity
-              style={[
-                styles.typeButton,
-                selectedType === "CRYPTO" && styles.selectedType,
-              ]}
-              onPress={() => setSelectedType("CRYPTO")}
-            >
-              <Text
-                style={[
-                  styles.typeButtonText,
-                  selectedType === "CRYPTO" && styles.selectedTypeText,
-                ]}
-              >
-                Crypto
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.typeButton,
-                selectedType === "FOREX" && styles.selectedType,
-              ]}
-              onPress={() => setSelectedType("FOREX")}
-            >
-              <Text
-                style={[
-                  styles.typeButtonText,
-                  selectedType === "FOREX" && styles.selectedTypeText,
-                ]}
-              >
-                Forex
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {selectedType === "CRYPTO" ? (
-            <View style={styles.cryptoSelector}>
-              {["BTC", "ETH", "USDT"].map((crypto) => (
                 <TouchableOpacity
-                  key={crypto}
-                  style={[
-                    styles.assetButton,
-                    selectedCrypto === crypto && styles.selectedAsset,
-                  ]}
-                  onPress={() => setSelectedCrypto(crypto)}
+                  style={styles.instructionButton}
+                  onPress={() => setShowInstructions(true)}
+                  activeOpacity={0.7}
                 >
-                  <Text
-                    style={[
-                      styles.assetButtonText,
-                      selectedCrypto === crypto && styles.selectedAssetText,
-                    ]}
-                  >
-                    {crypto}
-                  </Text>
+                  <Ionicons
+                    name="help-circle"
+                    size={24}
+                    color={Colors.redTheme.background}
+                  />
                 </TouchableOpacity>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.currencySelector}>
-              {["USD", "JPY"].map((currency) => (
-                <TouchableOpacity
-                  key={currency}
-                  style={[
-                    styles.assetButton,
-                    selectedCurrency === currency && styles.selectedAsset,
-                  ]}
-                  onPress={() => setSelectedCurrency(currency)}
-                >
-                  <Text
-                    style={[
-                      styles.assetButtonText,
-                      selectedCurrency === currency && styles.selectedAssetText,
-                    ]}
-                  >
-                    {currency}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator
-                size="large"
-                color={Colors.redTheme.background}
-              />
-            </View>
-          ) : (
-            <>
-              {renderError()}
-
-              <View style={styles.priceContainer}>
-                {selectedType === "CRYPTO" ? (
-                  <>
-                    <Text style={styles.priceText}>
-                      Current Price: 1 {selectedCrypto} = $
-                      {price.toLocaleString(undefined, {
-                        minimumFractionDigits:
-                          selectedCrypto === "USDT" ? 4 : 2,
-                        maximumFractionDigits:
-                          selectedCrypto === "USDT" ? 4 : 2,
-                      })}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.priceChangeText,
-                        { color: priceChange >= 0 ? "#4CAF50" : "#f44336" },
-                      ]}
-                    >
-                      {priceChange >= 0 ? "↑" : "↓"}{" "}
-                      {Math.abs(priceChange).toFixed(
-                        selectedCrypto === "USDT" ? 4 : 2
-                      )}
-                      %<Text style={styles.timeRangeText}> ({timeRange})</Text>
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.priceText}>
-                      Current Rate: 1 {selectedCurrency} = ₱
-                      {(1 / exchangeRates[selectedCurrency]).toFixed(2)}
-                    </Text>
-                    <Text style={styles.priceText}>
-                      1 PHP = {exchangeRates[selectedCurrency].toFixed(4)}{" "}
-                      {selectedCurrency}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.priceChangeText,
-                        {
-                          color: forexPriceChange >= 0 ? "#4CAF50" : "#f44336",
-                        },
-                      ]}
-                    >
-                      {forexPriceChange >= 0 ? "↑" : "↓"}{" "}
-                      {Math.abs(forexPriceChange).toFixed(2)}%
-                      <Text style={styles.timeRangeText}> ({timeRange})</Text>
-                    </Text>
-                  </>
-                )}
               </View>
-
-              <View style={styles.tradingContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder={`Amount in ${
-                    selectedType === "CRYPTO" ? selectedCrypto : "PHP"
-                  }`}
-                  value={amount}
-                  onChangeText={setAmount}
-                  keyboardType="numeric"
-                  placeholderTextColor="#666"
-                />
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity
-                    style={[styles.button, styles.buyButton]}
-                    onPress={handleBuy}
-                    disabled={loading}
-                  >
-                    <Text style={styles.buttonText}>
-                      {loading ? "Processing..." : "Buy"}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.button, styles.sellButton]}
-                    onPress={handleSell}
-                    disabled={loading}
-                  >
-                    <Text style={styles.buttonText}>
-                      {loading ? "Processing..." : "Sell"}
-                    </Text>
-                  </TouchableOpacity>
+              <View style={styles.balancesContainer}>
+                <View style={styles.cryptoBalancesContainer}>
+                  <Text style={styles.balanceTitle}>Crypto Balances:</Text>
+                  <Text style={styles.balanceText}>
+                    BTC: {cryptoBalances.BTC.toFixed(8)}
+                  </Text>
+                  <Text style={styles.balanceText}>
+                    ETH: {cryptoBalances.ETH.toFixed(8)}
+                  </Text>
+                  <Text style={styles.balanceText}>
+                    USDT: {cryptoBalances.USDT.toFixed(8)}
+                  </Text>
+                </View>
+                <View style={styles.currencyBalancesContainer}>
+                  <Text style={styles.balanceTitle}>Forex Balances:</Text>
+                  <Text style={styles.balanceText}>
+                    USD: {currencyBalances.USD.toFixed(2)}
+                  </Text>
+                  <Text style={styles.balanceText}>
+                    JPY: {currencyBalances.JPY.toFixed(2)}
+                  </Text>
                 </View>
               </View>
+            </View>
 
-              {selectedType === "CRYPTO" && (
-                <>
-                  <View style={styles.timeRangeSelector}>
-                    {["24h", "7d", "30d"].map((range) => (
-                      <TouchableOpacity
-                        key={range}
+            <View style={styles.typeSelector}>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  selectedType === "CRYPTO" && styles.selectedType,
+                ]}
+                onPress={() => setSelectedType("CRYPTO")}
+              >
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    selectedType === "CRYPTO" && styles.selectedTypeText,
+                  ]}
+                >
+                  Crypto
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  selectedType === "FOREX" && styles.selectedType,
+                ]}
+                onPress={() => setSelectedType("FOREX")}
+              >
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    selectedType === "FOREX" && styles.selectedTypeText,
+                  ]}
+                >
+                  Forex
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {selectedType === "CRYPTO" ? (
+              <View style={styles.cryptoSelector}>
+                {["BTC", "ETH", "USDT"].map((crypto) => (
+                  <TouchableOpacity
+                    key={crypto}
+                    style={[
+                      styles.assetButton,
+                      selectedCrypto === crypto && styles.selectedAsset,
+                    ]}
+                    onPress={() => setSelectedCrypto(crypto)}
+                  >
+                    <Text
+                      style={[
+                        styles.assetButtonText,
+                        selectedCrypto === crypto && styles.selectedAssetText,
+                      ]}
+                    >
+                      {crypto}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.currencySelector}>
+                {["USD", "JPY"].map((currency) => (
+                  <TouchableOpacity
+                    key={currency}
+                    style={[
+                      styles.assetButton,
+                      selectedCurrency === currency && styles.selectedAsset,
+                    ]}
+                    onPress={() => setSelectedCurrency(currency)}
+                  >
+                    <Text
+                      style={[
+                        styles.assetButtonText,
+                        selectedCurrency === currency &&
+                          styles.selectedAssetText,
+                      ]}
+                    >
+                      {currency}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator
+                  size="large"
+                  color={Colors.redTheme.background}
+                />
+              </View>
+            ) : (
+              <>
+                {renderError()}
+
+                <View style={styles.priceContainer}>
+                  {selectedType === "CRYPTO" ? (
+                    <>
+                      <Text style={styles.priceText}>
+                        Current Price: 1 {selectedCrypto} = $
+                        {price.toLocaleString(undefined, {
+                          minimumFractionDigits:
+                            selectedCrypto === "USDT" ? 4 : 2,
+                          maximumFractionDigits:
+                            selectedCrypto === "USDT" ? 4 : 2,
+                        })}
+                      </Text>
+                      <Text
                         style={[
-                          styles.timeRangeButton,
-                          timeRange === range && styles.selectedTimeRange,
+                          styles.priceChangeText,
+                          { color: priceChange >= 0 ? "#4CAF50" : "#f44336" },
                         ]}
-                        onPress={() => setTimeRange(range)}
                       >
-                        <Text
-                          style={[
-                            styles.timeRangeText,
-                            timeRange === range && styles.selectedTimeRangeText,
-                          ]}
-                        >
-                          {range}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-
-                  {chartData.datasets[0].data.length > 0 && (
-                    <ChartComponent
-                      data={chartData}
-                      selectedCrypto={selectedCrypto}
-                    />
-                  )}
-                </>
-              )}
-
-              {selectedType === "FOREX" && (
-                <>
-                  <View style={styles.timeRangeSelector}>
-                    {["24h", "7d", "30d"].map((range) => (
-                      <TouchableOpacity
-                        key={range}
+                        {priceChange >= 0 ? "↑" : "↓"}{" "}
+                        {Math.abs(priceChange).toFixed(
+                          selectedCrypto === "USDT" ? 4 : 2
+                        )}
+                        %
+                        <Text style={styles.timeRangeText}> ({timeRange})</Text>
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text style={styles.priceText}>
+                        Current Rate: 1 {selectedCurrency} = ₱
+                        {(1 / exchangeRates[selectedCurrency]).toFixed(2)}
+                      </Text>
+                      <Text style={styles.priceText}>
+                        1 PHP = {exchangeRates[selectedCurrency].toFixed(4)}{" "}
+                        {selectedCurrency}
+                      </Text>
+                      <Text
                         style={[
-                          styles.timeRangeButton,
-                          timeRange === range && styles.selectedTimeRange,
+                          styles.priceChangeText,
+                          {
+                            color:
+                              forexPriceChange >= 0 ? "#4CAF50" : "#f44336",
+                          },
                         ]}
-                        onPress={() => setTimeRange(range)}
                       >
-                        <Text
-                          style={[
-                            styles.timeRangeText,
-                            timeRange === range && styles.selectedTimeRangeText,
-                          ]}
-                        >
-                          {range}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-
-                  {forexChartData.datasets[0].data.length > 0 && (
-                    <ChartComponent
-                      data={forexChartData}
-                      selectedCrypto={selectedCurrency}
-                    />
+                        {forexPriceChange >= 0 ? "↑" : "↓"}{" "}
+                        {Math.abs(forexPriceChange).toFixed(2)}%
+                        <Text style={styles.timeRangeText}> ({timeRange})</Text>
+                      </Text>
+                    </>
                   )}
-                </>
-              )}
-            </>
-          )}
-        </ScrollView>
-      </TouchableWithoutFeedback>
-      <SafeAreaView style={styles.androidSafeArea} />
-    </ImageBackground>
+                </View>
+
+                {selectedType === "CRYPTO" && (
+                  <>
+                    {renderTimeRangeSelector()}
+                    {chartData.datasets[0].data.length > 0 && (
+                      <ChartComponent
+                        data={chartData}
+                        selectedCrypto={selectedCrypto}
+                      />
+                    )}
+                  </>
+                )}
+
+                {selectedType === "FOREX" && (
+                  <>
+                    {renderTimeRangeSelector()}
+                    {forexChartData.datasets[0].data.length > 0 && (
+                      <ChartComponent
+                        data={forexChartData}
+                        selectedCrypto={selectedCurrency}
+                      />
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </ScrollView>
+
+          <View
+            style={[
+              styles.tradingContainer,
+              Platform.OS === "android" && styles.androidTradingContainer,
+            ]}
+          >
+            <TextInput
+              style={styles.input}
+              placeholder={`Amount in ${
+                selectedType === "CRYPTO" ? selectedCrypto : "PHP"
+              }`}
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="numeric"
+              placeholderTextColor="#666"
+            />
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.buyButton]}
+                onPress={handleBuy}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? "Processing..." : "Buy"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.sellButton]}
+                onPress={handleSell}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? "Processing..." : "Sell"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   container: {
     flex: 1,
   },
-  androidSafeArea: {
-    flex: 0,
-    backgroundColor: "transparent",
-  },
   scrollView: {
     flex: 1,
+  },
+  scrollViewContent: {
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingBottom: 20,
   },
   header: {
     padding: 20,
@@ -1492,8 +1743,9 @@ const styles = StyleSheet.create({
   tradingContainer: {
     padding: 20,
     backgroundColor: "rgba(255, 255, 255, 0.9)",
-    marginTop: 10,
-    marginBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    width: "100%",
   },
   input: {
     borderWidth: 1,
@@ -1603,6 +1855,7 @@ const styles = StyleSheet.create({
   candleContainer: {
     position: "absolute",
     height: "100%",
+    transformOrigin: "bottom",
   },
   candleWick: {
     position: "absolute",
@@ -1718,6 +1971,24 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
     lineHeight: 24,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  androidTradingContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 
