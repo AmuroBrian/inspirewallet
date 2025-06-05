@@ -162,6 +162,22 @@ export default function Index() {
     },
     {
       id: "16",
+      title: "Test",
+      iconSource: require("../../assets/images/helpcenter.png"),
+      routeData: () => {
+        router.push("test");
+      },
+    },
+    {
+      id: "17",
+      title: "Test2",
+      iconSource: require("../../assets/images/aboutus.png"),
+      routeData: () => {
+        router.push("test2");
+      },
+    },
+    {
+      id: "18",
       title: "Auto",
       iconSource: require("../../assets/images/helpcenter.png"),
       routeData: () => {
