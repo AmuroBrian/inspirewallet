@@ -176,6 +176,14 @@ export default function Index() {
         router.push("test2");
       },
     },
+    {
+      id: "18",
+      title: "Auto",
+      iconSource: require("../../assets/images/helpcenter.png"),
+      routeData: () => {
+        router.push("investmentauto");
+      },
+    },
   ];
 
   useEffect(() => {

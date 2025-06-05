@@ -22,7 +22,7 @@ export default function USDTAmountContent({ usdtAmount }) {
           paddingLeft: 10,
         }}
       >
-        Cryptocurrency Amount
+        Available Balance
       </Text>
       <Text
         style={{
