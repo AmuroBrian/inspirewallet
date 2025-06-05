@@ -22,7 +22,7 @@ export default function AvailBalanceContent({ dollarDepositAmount }) {
           paddingLeft: 10,
         }}
       >
-        Dollar Deposit
+        Amount Wallet
       </Text>
       <Text
         style={{

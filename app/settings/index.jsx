@@ -160,6 +160,14 @@ export default function Index() {
         router.push("helpcenter");
       },
     },
+    {
+      id: "16",
+      title: "Auto",
+      iconSource: require("../../assets/images/helpcenter.png"),
+      routeData: () => {
+        router.push("investmentauto");
+      },
+    },
   ];
 
   useEffect(() => {
